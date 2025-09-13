@@ -1,0 +1,49 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="25%" stop-color="#3B82F6" />
+      <stop offset="50%" stop-color="#EC4899" />
+      <stop offset="75%" stop-color="#F97316" />
+      <stop offset="100%" stop-color="#EAB308" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Glow effect background -->
+  <circle
+    cx="20"
+    cy="20"
+    r="18"
+    fill="url(#logoGradient)"
+    filter="url(#glow)"
+    opacity="0.3"
+  />
+  
+  <!-- Main G shape with flame extension -->
+  <path
+    d="M20 8C15 8 10 12 10 18C10 24 15 28 20 28C22 28 24 27 26 26L26 22L22 22L22 24C20 25 18 25 16 24C14 23 12 21 12 18C12 15 14 12 16 11C18 10 20 10 22 11L22 8C20 7 18 7 16 8C14 9 12 11 10 14C8 17 8 21 10 24C12 27 16 29 20 29C24 29 28 25 28 20C28 15 25 10 20 8Z"
+    fill="url(#logoGradient)"
+    filter="url(#glow)"
+  />
+  
+  <!-- Flame extension -->
+  <path
+    d="M26 26L30 22L28 20L26 22L26 26Z"
+    fill="url(#logoGradient)"
+    filter="url(#glow)"
+  />
+  
+  <!-- Inner G detail -->
+  <path
+    d="M18 16C17 16 16 17 16 18C16 19 17 20 18 20C19 20 20 19 20 18C20 17 19 16 18 16Z"
+    fill="url(#logoGradient)"
+    opacity="0.9"
+  />
+</svg>

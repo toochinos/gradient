@@ -1,0 +1,1282 @@
+'use client';
+
+import GradientGenerator, { GradientGeneratorRef, MeshPoint } from '@/components/GradientGenerator';
+import CookieBanner from '@/components/CookieBanner';
+import CodeModal from '@/components/CodeModal';
+import MuiBlurSlider from '@/components/MuiBlurSlider';
+import MuiAngleSlider from '@/components/MuiAngleSlider';
+import MuiNoiseSlider from '@/components/MuiNoiseSlider';
+import ColorPicker from '@/components/ColorPicker';
+import SketchColorPicker from '@/components/SketchColorPicker';
+import { useRef, useState, useEffect, useCallback } from 'react';
+import { Film } from 'lucide-react';
+
+export default function Home() {
+  const gradientRef = useRef<GradientGeneratorRef>(null);
+  const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+  const [generatedCSS, setGeneratedCSS] = useState('');
+  const [selectedColorId, setSelectedColorId] = useState<string | null>(null);
+  const [colorPickerOpen, setColorPickerOpen] = useState(false);
+  const [linearManualDropdownOpen, setLinearManualDropdownOpen] = useState<string | null>(null);
+  const [dragState, setDragState] = useState<{
+    isDragging: boolean;
+    dragOffset: { x: number; y: number };
+    targetId: string | null;
+  }>({
+    isDragging: false,
+    dragOffset: { x: 0, y: 0 },
+    targetId: null
+  });
+  
+  const [dropdownPositions, setDropdownPositions] = useState<Record<string, { x: number; y: number }>>({});
+  const [backgroundColor, setBackgroundColor] = useState('#000000');
+  const [backgroundColorPickerOpen, setBackgroundColorPickerOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [fullscreenKey, setFullscreenKey] = useState(0);
+  const [gradientType, setGradientType] = useState<'linear' | 'radial' | 'circular'>('circular');
+  const [gradientAngle, setGradientAngle] = useState(0);
+  const [addNoise, setAddNoise] = useState(false);
+  const [noiseIntensity, setNoiseIntensity] = useState(12);
+  const [meshPoints, setMeshPoints] = useState<MeshPoint[]>([
+    { id: '1', x: 30, y: 40, color: '#0DD162', name: 'Bright Green', blur: 100, hideColor: false, hideBalls: false },
+    { id: '2', x: 70, y: 60, color: '#0D7CD1', name: 'Blue', blur: 100, hideColor: false, hideBalls: false }
+  ]);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [animationSpeed, setAnimationSpeed] = useState(1);
+  
+  // Animation refs - NO STATE UPDATES
+  const animationFrameRef = useRef<number | null>(null);
+  const gradientGeneratorRef = useRef<any>(null);
+
+  // History management for undo functionality
+  const [history, setHistory] = useState<{
+    meshPoints: typeof meshPoints;
+    gradientType: typeof gradientType;
+    gradientAngle: typeof gradientAngle;
+    backgroundColor: typeof backgroundColor;
+    addNoise: typeof addNoise;
+    noiseIntensity: typeof noiseIntensity;
+  }[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  // Initialize history with current state
+  useEffect(() => {
+    if (history.length === 0) {
+      const initialState = {
+        meshPoints,
+        gradientType,
+        gradientAngle,
+        backgroundColor,
+        addNoise,
+        noiseIntensity,
+      };
+      setHistory([initialState]);
+      setHistoryIndex(0);
+    }
+  }, []);
+
+  // Save current state to history
+  const saveToHistory = useCallback(() => {
+    const currentState = {
+      meshPoints,
+      gradientType,
+      gradientAngle,
+      backgroundColor,
+      addNoise,
+      noiseIntensity
+    };
+
+    setHistory(prev => {
+      // Remove any future history if we're not at the end
+      const newHistory = prev.slice(0, historyIndex + 1);
+      // Add new state
+      newHistory.push(currentState);
+      // Limit history to 50 items
+      if (newHistory.length > 50) {
+        newHistory.shift();
+        return newHistory;
+      }
+      return newHistory;
+    });
+
+    setHistoryIndex(prev => Math.min(prev + 1, 49));
+  }, [meshPoints, gradientType, gradientAngle, backgroundColor, addNoise, noiseIntensity, historyIndex]);
+
+  // Undo functionality
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) {
+      const previousState = history[historyIndex - 1];
+      setMeshPoints(previousState.meshPoints);
+      setGradientType(previousState.gradientType);
+      setGradientAngle(previousState.gradientAngle);
+      setBackgroundColor(previousState.backgroundColor);
+      setAddNoise(previousState.addNoise);
+      setNoiseIntensity(previousState.noiseIntensity);
+      setHistoryIndex(prev => prev - 1);
+    }
+  }, [history, historyIndex]);
+
+  const handleCodeButtonClick = () => {
+    if (gradientRef.current) {
+      const css = gradientRef.current.generateCSS();
+      setGeneratedCSS(css);
+      setIsCodeModalOpen(true);
+    }
+  };
+
+  const handleDownloadClick = () => {
+    if (!gradientRef.current) return;
+    
+    const css = gradientRef.current.generateCSS();
+    const blob = new Blob([css], { type: 'text/css' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'gradient.css';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportAnimationClick = () => {
+    if (!gradientRef.current || animationKeyframes.length === 0) return;
+    
+    const baseCSS = gradientRef.current.generateCSS();
+    
+    // Generate CSS keyframes from recorded animation
+    let animatedCSS = baseCSS + '\n\n/* Animation Keyframes */\n';
+    animatedCSS += '@keyframes meshGradientAnimation {\n';
+    
+    animationKeyframes.forEach((keyframe, index) => {
+      const percentage = ((index / (animationKeyframes.length - 1)) * 100).toFixed(1);
+      animatedCSS += `  ${percentage}% {\n`;
+      animatedCSS += `    /* Frame ${index + 1}: Apply these mesh point positions */\n`;
+      animatedCSS += `    /* x: ${keyframe.map(p => p.x + '%').join(', ')} */\n`;
+      animatedCSS += `    /* y: ${keyframe.map(p => p.y + '%').join(', ')} */\n`;
+      animatedCSS += `    /* colors: ${keyframe.map(p => p.color).join(', ')} */\n`;
+      animatedCSS += `  }\n`;
+    });
+    
+    animatedCSS += '}\n\n';
+    animatedCSS += '/* Apply animation to your element */\n';
+    animatedCSS += '.animated-gradient {\n';
+    const actualDuration = (10 / animationSpeed).toFixed(2);
+    animatedCSS += `  animation: meshGradientAnimation ${actualDuration}s ease-in-out infinite;\n`;
+    animatedCSS += '}\n';
+    
+    setGeneratedCSS(animatedCSS);
+    setIsCodeModalOpen(true);
+  };
+
+  const handleAddColor = () => {
+    saveToHistory(); // Save current state before making changes
+    
+    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    
+      const newPoint = {
+      id: `${Date.now()}-${Math.random()}`,
+      x: Math.random() * 80 + 10, // Random position between 10% and 90%
+        y: Math.random() * 80 + 10,
+        color: randomColor,
+      blur: 100,  // Start with 100px blur for new colors
+        name: 'Custom Color'
+      };
+    
+    const newPoints = [...meshPoints, newPoint];
+    setMeshPoints(newPoints);
+  };
+
+  const handleRemoveColor = (pointId: string) => {
+    saveToHistory(); // Save current state before making changes
+    
+    const newPoints = meshPoints.filter(point => point.id !== pointId);
+    setMeshPoints(newPoints);
+    
+    // If removed color was selected, clear selection
+    if (selectedColorId === pointId) {
+      setSelectedColorId(null);
+    }
+  };
+
+  const handleRowSelect = (pointId: string) => {
+    setSelectedColorId(pointId);
+    // Don't open color picker, just select the row
+  };
+
+  const handleColorSwatchClick = (pointId: string) => {
+    setSelectedColorId(pointId);
+    setColorPickerOpen(true);
+  };
+
+  const handleColorChange = (newColor: string) => {
+    if (selectedColorId) {
+      saveToHistory(); // Save current state before making changes
+      
+      setMeshPoints(prev => prev.map(point => 
+        point.id === selectedColorId ? { ...point, color: newColor } : point
+      ));
+    }
+  };
+
+  const handleCloseColorPicker = () => {
+    setColorPickerOpen(false);
+    setSelectedColorId(null);
+  };
+
+  const handleBlurChange = (blurValue: number) => {
+    if (selectedColorId) {
+      saveToHistory(); // Save current state before making changes
+      
+      // Enforce minimum blur value of 36px
+      const adjustedBlur = Math.max(36, blurValue);
+      
+      // Update local state
+      setMeshPoints(prev => prev.map(point => 
+        point.id === selectedColorId ? { ...point, blur: adjustedBlur } : point
+      ));
+    }
+  };
+
+  const getSelectedColorBlur = () => {
+    if (!selectedColorId) return 36;
+    const selectedPoint = meshPoints.find(point => point.id === selectedColorId);
+    return Math.max(36, selectedPoint?.blur || 36);
+  };
+
+
+  // Removed handleColorChange function
+
+  const handleToggleHideColor = (pointId: string) => {
+    saveToHistory(); // Save current state before making changes
+    
+    setMeshPoints(prev => prev.map(point => 
+      point.id === pointId ? { ...point, hideColor: !(point.hideColor ?? false) } : point
+    ));
+  };
+
+  const handleToggleHideBalls = (pointId: string) => {
+    saveToHistory(); // Save current state before making changes
+    
+    setMeshPoints(prev => prev.map(point => 
+      point.id === pointId ? { ...point, hideBalls: !(point.hideBalls ?? false) } : point
+    ));
+  };
+
+  const handleToggleLinearManualDropdown = (pointId: string) => {
+    saveToHistory(); // Save current state before making changes
+    
+    // Toggle the manual linear mode for this color
+    setMeshPoints(prev => prev.map(point => 
+      point.id === pointId ? { ...point, isManualLinear: !point.isManualLinear } : point
+    ));
+    
+    setLinearManualDropdownOpen(prev => prev === pointId ? null : pointId);
+  };
+
+  const handleCloseLinearManualDropdown = () => {
+    setLinearManualDropdownOpen(null);
+  };
+
+  const handleResetPosition = (pointId: string) => {
+    setDropdownPositions(prev => {
+      const newPositions = { ...prev };
+      delete newPositions[pointId];
+      return newPositions;
+    });
+  };
+
+  // Helper function to check if a color has any individual fade values set or is in manual linear mode
+  const hasIndividualFades = (item: MeshPoint) => {
+    return item.isManualLinear || 
+           (item.individualFadeLeft && item.individualFadeLeft > 0) ||
+           (item.individualFadeRight && item.individualFadeRight > 0) ||
+           (item.individualFadeTop && item.individualFadeTop > 0) ||
+           (item.individualFadeBottom && item.individualFadeBottom > 0);
+  };
+
+  const handleDragStart = (e: React.MouseEvent, targetId: string) => {
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    const currentPosition = dropdownPositions[targetId] || { x: rect.left, y: rect.top };
+    
+    setDragState({
+      isDragging: true,
+      dragOffset: {
+        x: e.clientX - currentPosition.x,
+        y: e.clientY - currentPosition.y
+      },
+      targetId
+    });
+  };
+
+  const handleDragMove = useCallback((e: MouseEvent) => {
+    if (dragState.isDragging && dragState.targetId) {
+      const newPosition = {
+        x: e.clientX - dragState.dragOffset.x,
+        y: e.clientY - dragState.dragOffset.y
+      };
+      
+      setDropdownPositions(prev => ({
+        ...prev,
+        [dragState.targetId!]: newPosition
+      }));
+    }
+  }, [dragState.isDragging, dragState.targetId, dragState.dragOffset]);
+
+  const handleDragEnd = useCallback(() => {
+    setDragState(prev => ({
+      ...prev,
+      isDragging: false,
+      targetId: null
+    }));
+  }, []);
+
+  // Add global mouse event listeners for dragging
+  useEffect(() => {
+    if (dragState.isDragging) {
+      document.addEventListener('mousemove', handleDragMove);
+      document.addEventListener('mouseup', handleDragEnd);
+      document.body.style.cursor = 'grabbing';
+      return () => {
+        document.removeEventListener('mousemove', handleDragMove);
+        document.removeEventListener('mouseup', handleDragEnd);
+        document.body.style.cursor = '';
+      };
+    }
+  }, [dragState.isDragging, handleDragMove, handleDragEnd]);
+
+  const handleIndividualFadeChange = (pointId: string, direction: 'left' | 'right' | 'top' | 'bottom', value: number) => {
+    saveToHistory(); // Save current state before making changes
+    
+    setMeshPoints(prev => prev.map(point => 
+      point.id === pointId ? { 
+        ...point, 
+        [`individualFade${direction.charAt(0).toUpperCase() + direction.slice(1)}`]: value 
+      } : point
+    ));
+  };
+
+  // Color picker functionality removed
+
+  const handleBackgroundColorChange = (newColor: string) => {
+    saveToHistory(); // Save current state before making changes
+    setBackgroundColor(newColor);
+    setBackgroundColorPickerOpen(false);
+  };
+
+  const handleBackgroundColorSquareClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBackgroundColorPickerOpen(!backgroundColorPickerOpen);
+  };
+
+  const handleGradientTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    saveToHistory(); // Save current state before making changes
+    setGradientType(e.target.value as 'linear' | 'radial' | 'circular');
+  };
+
+  const handleShufflePositions = () => {
+    saveToHistory(); // Save current state before making changes
+    
+    // Generate new random positions for all mesh points
+    const shuffledPoints = meshPoints.map(point => ({
+      ...point,
+      x: Math.floor(Math.random() * 80) + 10, // Random position between 10% and 90%
+      y: Math.floor(Math.random() * 80) + 10  // Random position between 10% and 90%
+    }));
+
+    if (!checkForDuplicateIds(shuffledPoints)) {
+      setMeshPoints(shuffledPoints);
+    }
+  };
+
+  const toggleFullscreen = () => {
+    if (!isFullscreen) {
+      // When opening fullscreen, force update with current data
+      setFullscreenKey(Date.now());
+    }
+    setIsFullscreen(!isFullscreen);
+  };
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // Close fullscreen with ESC key
+      if (event.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+        return;
+      }
+      
+      // Undo with Ctrl+Z (Cmd+Z on Mac)
+      if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+        event.preventDefault();
+        handleUndo();
+        return;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [isFullscreen, handleUndo]);
+
+  // Close color pickers when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      
+      if (backgroundColorPickerOpen && !target.closest('.background-color-picker-container')) {
+        setBackgroundColorPickerOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [backgroundColorPickerOpen]);
+
+  // Update fullscreen when mesh points, background color, gradient type, angle, or noise settings change
+  useEffect(() => {
+    if (isFullscreen) {
+      setFullscreenKey(Date.now());
+    }
+  }, [meshPoints, backgroundColor, gradientType, gradientAngle, addNoise, noiseIntensity, isFullscreen]);
+
+  // Auto-generate CSS whenever gradient parameters change (use base meshPoints, not animated ones)
+  useEffect(() => {
+    if (gradientRef.current) {
+      const css = gradientRef.current.generateCSS();
+      setGeneratedCSS(css);
+    }
+  }, [meshPoints, backgroundColor, gradientType, gradientAngle, addNoise, noiseIntensity]);
+
+  // Utility function to check for duplicate IDs
+  const checkForDuplicateIds = (points: { id: string }[]) => {
+    const uniqueIds = new Set(points.map(p => p.id));
+    const hasDuplicates = uniqueIds.size !== points.length;
+    if (hasDuplicates) {
+      console.error('Duplicate IDs detected:', points);
+      console.error('Expected unique IDs:', uniqueIds.size, 'Actual points:', points.length);
+    }
+    return hasDuplicates;
+  };
+
+  // Callback for fullscreen mesh points changes
+  const handleFullscreenMeshPointsChange = useCallback((newPoints: MeshPoint[]) => {
+    if (!checkForDuplicateIds(newPoints)) {
+      saveToHistory(); // Save current state before making changes
+      const pointsWithNames = newPoints.map(point => ({
+        ...point,
+        name: point.name || 'Custom Color',
+        blur: point.blur || 100
+      }));
+      setMeshPoints(pointsWithNames);
+    }
+  }, [saveToHistory]);
+
+  const handlePointSelect = useCallback((pointId: string) => {
+    setSelectedColorId(pointId);
+    // Don't open color picker automatically when clicking circles
+  }, []);
+
+  const handleGenerate = () => {
+    saveToHistory(); // Save current state before making changes
+    
+    // Generate random color
+    const generateRandomColor = () => {
+      const hue = Math.floor(Math.random() * 360);
+      const saturation = Math.floor(Math.random() * 40) + 60; // 60-100%
+      const lightness = Math.floor(Math.random() * 30) + 40; // 40-70%
+      return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    };
+
+    // Generate random position
+    const generateRandomPosition = () => {
+      return {
+        x: Math.floor(Math.random() * 80) + 10, // 10-90%
+        y: Math.floor(Math.random() * 80) + 10, // 10-90%
+      };
+    };
+
+    // Generate new random gradient by updating parent state directly
+      const newPoints = meshPoints.map(point => ({
+        ...point,
+      color: generateRandomColor(),
+      ...generateRandomPosition(),
+      blur: Math.max(36, 100 + Math.floor(Math.random() * 100)) // 100-200px, minimum 36px
+    }));
+    
+    if (!checkForDuplicateIds(newPoints)) {
+      setMeshPoints(newPoints);
+    }
+  };
+
+  // Animation functions
+  const handleToggleAnimation = () => {
+    setIsAnimating(!isAnimating);
+  };
+
+  const handleResetAnimation = () => {
+    // Start reset animation
+    setIsResetting(true);
+    
+    // Clear recorded animation to force new recording on next animate
+    setAnimationKeyframes([]);
+    setCurrentKeyframe(0);
+    setAnimationStartTime(null);
+    
+    // Stop reset animation after 1 second
+    setTimeout(() => {
+      setIsResetting(false);
+    }, 1000);
+  };
+
+  // Generate keyframes once when animation starts
+  const [animationKeyframes, setAnimationKeyframes] = useState<MeshPoint[][]>([]);
+  const [currentKeyframe, setCurrentKeyframe] = useState(0);
+  const [animationStartTime, setAnimationStartTime] = useState<number | null>(null);
+  const [isResetting, setIsResetting] = useState(false);
+
+  // Generate animation keyframes (only once when animation starts)
+  const generateAnimationKeyframes = useCallback(() => {
+    if (meshPoints.length === 0) return [];
+    
+    const keyframes: MeshPoint[][] = [];
+    const totalFrames = 60; // 60 frames for smooth animation
+    
+    for (let frame = 0; frame < totalFrames; frame++) {
+      const progress = (frame / totalFrames) * Math.PI * 2; // Full circle
+      
+      const framePoints = meshPoints.map((point, index) => {
+        const phaseOffset = index * (Math.PI / meshPoints.length);
+        const timePhase = progress + phaseOffset;
+        
+        const baseRadius = 15 + Math.sin(timePhase * 0.3) * 8;
+        const xOffset = Math.cos(timePhase) * baseRadius;
+        const yOffset = Math.sin(timePhase) * baseRadius;
+        
+        const driftX = Math.sin(timePhase * 0.7) * 5;
+        const driftY = Math.cos(timePhase * 0.5) * 5;
+        
+        const newX = Math.max(15, Math.min(85, point.x + xOffset * 0.1 + driftX * 0.05));
+        const newY = Math.max(15, Math.min(85, point.y + yOffset * 0.1 + driftY * 0.05));
+        
+        const blurVariation = Math.sin(timePhase * 1.2) * 30;
+        const newBlur = Math.max(50, Math.min(180, (point.blur || 100) + blurVariation));
+        
+        return { ...point, x: newX, y: newY, blur: newBlur };
+      });
+      
+      keyframes.push(framePoints);
+    }
+    
+    return keyframes;
+  }, [meshPoints]);
+
+  // Animation loop that cycles through keyframes
+  useEffect(() => {
+    if (!isAnimating) {
+      setCurrentKeyframe(0);
+      return;
+    }
+
+    // Generate keyframes once when animation starts
+    if (animationKeyframes.length === 0) {
+      const keyframes = generateAnimationKeyframes();
+      setAnimationKeyframes(keyframes);
+      setCurrentKeyframe(0);
+      setAnimationStartTime(Date.now());
+      return;
+    }
+
+    // Cycle through keyframes
+    const interval = setInterval(() => {
+      setCurrentKeyframe(prev => (prev + 1) % animationKeyframes.length);
+    }, (10000 / animationKeyframes.length) / animationSpeed); // 10 second loop
+
+    return () => clearInterval(interval);
+  }, [isAnimating, animationKeyframes.length, animationSpeed, generateAnimationKeyframes]);
+
+  // Timer to trigger re-renders for the 10-second export button delay
+  useEffect(() => {
+    if (!animationStartTime) return;
+    
+    const interval = setInterval(() => {
+      // Force re-render to check if 10 seconds have passed
+      if (Date.now() - animationStartTime >= 10000) {
+        clearInterval(interval);
+      }
+    }, 1000); // Check every second
+    
+    return () => clearInterval(interval);
+  }, [animationStartTime]);
+
+  // Get current mesh points - either animated keyframe or base points
+  const getCurrentMeshPoints = useCallback(() => {
+    if (isAnimating && animationKeyframes.length > 0) {
+      return animationKeyframes[currentKeyframe] || meshPoints;
+    }
+    return meshPoints;
+  }, [isAnimating, animationKeyframes, currentKeyframe, meshPoints]);
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Top Navigation Bar */}
+      <nav className="bg-gray-800 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-8">
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <svg className="w-8 h-8" viewBox="0 0 32 32" fill="none">
+                  <defs>
+                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#8b5cf6" />
+                      <stop offset="25%" stopColor="#a855f7" />
+                      <stop offset="50%" stopColor="#06b6d4" />
+                      <stop offset="75%" stopColor="#14b8a6" />
+                      <stop offset="100%" stopColor="#10b981" />
+                    </linearGradient>
+                    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#8b5cf6" />
+                      <stop offset="33%" stopColor="#06b6d4" />
+                      <stop offset="66%" stopColor="#10b981" />
+                      <stop offset="100%" stopColor="#f59e0b" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="16" cy="16" r="14" fill="url(#logoGradient)" className="drop-shadow-lg" />
+                  <path 
+                    d="M8 12 L24 12 L22 16 L24 20 L8 20 L10 16 Z" 
+                    fill="white" 
+                    opacity="0.95"
+                  />
+                </svg>
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-purple-400 via-cyan-400 to-green-400 bg-clip-text text-transparent">
+                Gradient Master
+              </span>
+            </div>
+            {/* Navigation Links */}
+            <div className="flex items-center space-x-6">
+              <a href="#" className="text-gray-300 hover:text-white transition-colors">Discover</a>
+              <a href="#" className="text-gray-300 hover:text-white transition-colors">Palettes</a>
+              <a href="#" className="text-gray-300 hover:text-white transition-colors">Gradients</a>
+              <div className="flex items-center space-x-1">
+                <a href="#" className="text-gray-300 hover:text-white transition-colors">Tools</a>
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          
+          {/* Right side buttons */}
+          <div className="flex items-center space-x-4">
+            <button className="text-gray-300 hover:text-white transition-colors">Upgrade</button>
+            <button className="text-gray-300 hover:text-white transition-colors">Sign in</button>
+            <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
+              Create account
+            </button>
+            <button className="text-gray-400 hover:text-white transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content Area */}
+      <div className="flex h-[calc(100vh-73px)]">
+        {/* Left Control Panel */}
+        <div className="w-80 bg-gray-800 border-r border-gray-700 p-6 overflow-y-auto overflow-x-visible">
+          <div className="space-y-6">
+            {/* Featured Tag and Title */}
+            <div>
+              <div className="inline-block bg-purple-100 text-purple-800 text-xs font-medium px-2 py-1 rounded mb-3">
+                FEATURED
+              </div>
+              <h1 className="text-xl font-semibold text-white">Mesh Gradient Generator</h1>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex items-center space-x-2">
+              <button 
+                onClick={handleGenerate}
+                className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Generate</span>
+              </button>
+              <button 
+                onClick={handleCodeButtonClick}
+                className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+                <span>Code</span>
+              </button>
+            </div>
+            
+            {/* Colors Section */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium text-gray-300">Colors</h3>
+                <button 
+                  onClick={handleAddColor}
+                  className="text-purple-400 hover:text-purple-300 text-sm transition-colors"
+                >
+                  + Add color
+                </button>
+              </div>
+              
+              <div className="space-y-2">
+                {/* Color items */}
+                {meshPoints.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className={`flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition-colors ${
+                      selectedColorId === item.id 
+                        ? 'bg-gray-700 border-2 border-white' 
+                        : 'bg-gray-700 hover:bg-gray-600 border-2 border-transparent'
+                    }`}
+                    onClick={() => handleRowSelect(item.id)}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <div className="relative">
+                        <div 
+                          className="w-6 h-6 rounded border border-gray-600 cursor-pointer hover:border-gray-400 transition-colors"
+                          style={{ backgroundColor: item.color }}
+                          title="Click to change color"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleColorSwatchClick(item.id);
+                          }}
+                        ></div>
+                        {/* Color Picker Dropdown */}
+                        {colorPickerOpen && selectedColorId === item.id && !isFullscreen && (
+                          <div className="absolute z-[999999] top-8 -left-4">
+                            <SketchColorPicker
+                              color={item.color}
+                              onChange={handleColorChange}
+                              onClose={handleCloseColorPicker}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <span className="text-sm text-gray-300 flex-1">{item.color}</span>
+                    <div className="flex items-center space-x-1">
+                      {/* Hide Color Button */}
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleHideColor(item.id);
+                        }}
+                        className={`transition-colors ${
+                          item.hideColor ?? false
+                            ? 'text-orange-400 hover:text-orange-300' 
+                            : 'text-gray-400 hover:text-orange-400'
+                        }`}
+                        title={item.hideColor ?? false ? "Show color" : "Hide color"}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.hideColor ?? false ? "M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" : "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"} />
+                        </svg>
+                      </button>
+
+                      {/* Hide Balls Button */}
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleHideBalls(item.id);
+                        }}
+                        className={`transition-colors ${
+                          item.hideBalls ?? false
+                            ? 'text-red-400 hover:text-red-300' 
+                            : 'text-gray-400 hover:text-blue-400'
+                        }`}
+                        title={item.hideBalls ?? false ? "Show control ball" : "Hide control ball"}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          {item.hideBalls ?? false ? (
+                            // Crossed out ball icon when hidden
+                            <>
+                              <circle cx="12" cy="12" r="4" strokeWidth={2} />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4l16 16" />
+                            </>
+                          ) : (
+                            // Regular ball icon when visible
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 12v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                          )}
+                        </svg>
+                      </button>
+
+                      {/* Linear Manual Button - Only show in linear mode */}
+                      {gradientType === 'linear' && (
+                        <div className="relative">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleLinearManualDropdown(item.id);
+                            }}
+                            className={`transition-colors ${
+                              hasIndividualFades(item)
+                                ? 'text-green-400 hover:text-green-300' 
+                                : 'text-gray-400 hover:text-green-400'
+                            }`}
+                            title={hasIndividualFades(item) ? "Linear Manual Controls (Active)" : "Linear Manual Controls"}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                            </svg>
+                          </button>
+                          
+                          {/* Linear Manual Dropdown */}
+                          {linearManualDropdownOpen === item.id && (
+                            <div 
+                              className={`${dropdownPositions[item.id] || (dragState.isDragging && dragState.targetId === item.id) ? 'fixed' : 'absolute'} z-[9999] bg-gray-800 border border-gray-600 rounded-lg shadow-xl min-w-[280px] ${dragState.isDragging && dragState.targetId === item.id ? 'cursor-grabbing' : ''}`}
+                              style={dropdownPositions[item.id] ? {
+                                left: `${dropdownPositions[item.id].x}px`,
+                                top: `${dropdownPositions[item.id].y}px`,
+                              } : {
+                                top: '32px',
+                                right: '0px',
+                              }}
+                            >
+                              <div 
+                                className="flex items-center justify-between mb-3 p-4 pb-2 cursor-grab active:cursor-grabbing border-b border-gray-700"
+                                onMouseDown={(e) => {
+                                  e.preventDefault();
+                                  handleDragStart(e, item.id);
+                                }}
+                                onDoubleClick={() => handleResetPosition(item.id)}
+                                title="Drag to move, double-click to reset position"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2zM3 16a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z"/>
+                                  </svg>
+                                  <h4 className="text-sm font-medium text-gray-300 select-none">Linear Fades {item.color}</h4>
+                                </div>
+                                <div className="flex items-center space-x-1">
+                                  {dropdownPositions[item.id] && (
+                                    <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleResetPosition(item.id);
+                                      }}
+                                      className="text-gray-400 hover:text-blue-400 transition-colors"
+                                      title="Reset position"
+                                    >
+                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                      </svg>
+                                    </button>
+                                  )}
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCloseLinearManualDropdown();
+                                    }}
+                                    className="text-gray-400 hover:text-white transition-colors"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="px-4 pb-4">
+                              
+                              <div className="space-y-3">
+                                <MuiBlurSlider
+                                  value={item.individualFadeLeft || 0}
+                                  onChange={(value) => handleIndividualFadeChange(item.id, 'left', value)}
+                                  min={0}
+                                  max={1000}
+                                  label="Fade Left"
+                                  showValue={true}
+                                />
+                                
+                                <MuiBlurSlider
+                                  value={item.individualFadeRight || 0}
+                                  onChange={(value) => handleIndividualFadeChange(item.id, 'right', value)}
+                                  min={0}
+                                  max={1000}
+                                  label="Fade Right"
+                                  showValue={true}
+                                />
+                                
+                                <MuiBlurSlider
+                                  value={item.individualFadeTop || 0}
+                                  onChange={(value) => handleIndividualFadeChange(item.id, 'top', value)}
+                                  min={0}
+                                  max={1000}
+                                  label="Fade Top"
+                                  showValue={true}
+                                />
+                                
+                                <MuiBlurSlider
+                                  value={item.individualFadeBottom || 0}
+                                  onChange={(value) => handleIndividualFadeChange(item.id, 'bottom', value)}
+                                  min={0}
+                                  max={1000}
+                                  label="Fade Bottom"
+                                  showValue={true}
+                                />
+                              </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Remove Color Button */}
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveColor(item.id);
+                        }}
+                        className="text-gray-400 hover:text-red-400 transition-colors"
+                        title="Remove color"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Center Gradient Preview Area */}
+        <div className="flex-1 overflow-hidden relative" style={{ backgroundColor: backgroundColor }}>
+          <GradientGenerator 
+            ref={gradientRef} 
+            selectedColorId={selectedColorId || undefined} 
+            backgroundColor={backgroundColor}
+            meshPoints={getCurrentMeshPoints()}
+            onMeshPointsChange={handleFullscreenMeshPointsChange}
+            onPointSelect={handlePointSelect}
+            gradientType={gradientType}
+            gradientAngle={gradientAngle}
+            addNoise={addNoise}
+            noiseIntensity={noiseIntensity}
+          />
+          
+          {/* Fullscreen Button */}
+          {!isFullscreen && (
+            <div className="absolute top-4 right-4 z-[99999]">
+              <button
+                onClick={toggleFullscreen}
+                className="bg-black/50 hover:bg-black/70 text-white p-3 rounded-lg transition-all duration-200 backdrop-blur-sm group shadow-lg hover:shadow-xl border border-white/10 hover:border-white/20"
+                title="View fullscreen"
+              >
+              <svg 
+                className="w-6 h-6 group-hover:scale-110 transition-transform" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" 
+                />
+              </svg>
+            </button>
+            </div>
+          )}
+        </div>
+
+        {/* Right Settings Panel */}
+        <div className="w-80 bg-gray-800 border-l border-gray-700 p-6 overflow-y-auto">
+          <div className="space-y-6">
+            {/* Top Actions */}
+            <div className="flex items-center space-x-2">
+              <button 
+                onClick={handleExportAnimationClick}
+                className={`flex items-center justify-center space-x-2 text-white px-4 py-3 rounded-lg transition-all duration-300 w-32 h-12 ${
+                  animationKeyframes.length > 0 && animationStartTime && (Date.now() - animationStartTime >= 10000)
+                    ? 'bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 shadow-lg' 
+                    : 'bg-gray-600 hover:bg-gray-500 cursor-not-allowed opacity-60'
+                }`}
+                title={animationKeyframes.length > 0 && animationStartTime && (Date.now() - animationStartTime >= 10000) ? "Export animation as CSS keyframes" : "Record an animation first"}
+                disabled={!(animationKeyframes.length > 0 && animationStartTime && (Date.now() - animationStartTime >= 10000))}
+              >
+                <Film className="w-4 h-4" />
+                <span className="text-xs">Export</span>
+              </button>
+              <button 
+                onClick={handleDownloadClick}
+                className="flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-500 text-white px-4 py-3 rounded-lg transition-colors w-32 h-12"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span className="text-xs">Download</span>
+              </button>
+            </div>
+            
+            {/* Background Color */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Background color</label>
+              <div className="flex items-center space-x-3">
+                <div className="relative">
+                  <div 
+                    className="w-8 h-8 rounded border border-gray-600 cursor-pointer hover:border-gray-400 transition-colors"
+                    style={{ backgroundColor: backgroundColor }}
+                    onClick={handleBackgroundColorSquareClick}
+                    title="Click to change background color"
+                  ></div>
+                  {backgroundColorPickerOpen && (
+                    <div className="background-color-picker-container fixed z-[100] bg-gray-800 border border-gray-600 rounded-lg p-4 shadow-xl" style={{
+                      left: '50%',
+                      top: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      maxWidth: '90vw',
+                      maxHeight: '90vh'
+                    }}>
+                      <SketchColorPicker
+                        color={backgroundColor}
+                        onChange={handleBackgroundColorChange}
+                        onClose={() => setBackgroundColorPickerOpen(false)}
+                      />
+                    </div>
+                  )}
+                </div>
+                <span className="text-sm text-gray-300">{backgroundColor}</span>
+              </div>
+            </div>
+            
+            
+            {/* Gradient Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Gradient type</label>
+              <select 
+                value={gradientType}
+                onChange={handleGradientTypeChange}
+                className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                <option value="radial">Radial</option>
+                <option value="linear">Linear</option>
+                <option value="circular">Circular</option>
+              </select>
+            </div>
+            
+            {/* Angle */}
+            <div>
+              <MuiAngleSlider
+                value={gradientAngle}
+                onChange={(value) => {
+                  saveToHistory(); // Save current state before making changes
+                  setGradientAngle(value);
+                }}
+                min={0}
+                max={360}
+                label="Angle (degrees)"
+                showValue={true}
+              />
+            </div>
+            
+            {/* Blend Mode */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Blend mode</label>
+              <select className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <option>normal</option>
+                <option>multiply</option>
+                <option>screen</option>
+                <option>overlay</option>
+              </select>
+            </div>
+            
+            {/* Animation */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Animation</label>
+              <div className="flex items-center space-x-2">
+                <button 
+                  onClick={handleToggleAnimation}
+                  className={`px-3 py-2 rounded-lg transition-colors flex-1 flex items-center justify-center space-x-2 ${
+                    isAnimating 
+                      ? 'bg-green-600 hover:bg-green-700 text-white' 
+                      : 'bg-gray-700 hover:bg-gray-600 text-white'
+                  }`}
+                  title={isAnimating ? "Stop animation" : "Start animation"}
+                >
+                  <Film className="w-4 h-4" />
+                  <span>{isAnimating ? 'Stop' : 'Animate'}</span>
+                </button>
+                <button 
+                  onClick={handleResetAnimation}
+                  className="relative p-2 rounded-lg transition-colors bg-gray-700 hover:bg-gray-600 text-white"
+                  title="Reset animation - record new sequence"
+                >
+                  <svg 
+                    className={`w-4 h-4 ${isResetting ? 'animate-spin' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  {isResetting && (
+                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap animate-fadeInOut">
+                      Reset
+                    </div>
+                  )}
+                </button>
+              </div>
+              {isAnimating && (
+                <div className="mt-3">
+                  <MuiBlurSlider
+                    value={animationSpeed}
+                    onChange={(value) => setAnimationSpeed(value)}
+                    min={0.1}
+                    max={3}
+                    label="Animation Speed"
+                    showValue={true}
+                  />
+                </div>
+              )}
+            </div>
+            
+            {/* Blur */}
+            <div>
+              <MuiBlurSlider
+                value={getSelectedColorBlur()}
+                onChange={handleBlurChange}
+                min={36}
+                max={200}
+                disabled={!selectedColorId}
+                label={selectedColorId ? "Blur Selected Color" : "Select a color to blur"}
+                showValue={!!selectedColorId}
+              />
+              {!selectedColorId && (
+                <p className="text-xs text-gray-500 mt-1">Click on a color above to select it for blur effects</p>
+              )}
+            </div>
+            
+            {/* Add Noise */}
+            <div>
+              <div className="flex items-center space-x-3 mb-3">
+                <input 
+                  type="checkbox" 
+                  id="noise" 
+                  checked={addNoise}
+                  onChange={(e) => {
+                    saveToHistory(); // Save current state before making changes
+                    setAddNoise(e.target.checked);
+                  }}
+                  className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                />
+                <label htmlFor="noise" className="text-sm text-gray-300">Add noise</label>
+              </div>
+              
+              {/* Noise Intensity Slider - only show when noise is enabled */}
+              {addNoise && (
+                <div>
+                  <MuiNoiseSlider
+                    value={noiseIntensity}
+                    onChange={(value) => {
+                      saveToHistory(); // Save current state before making changes
+                      setNoiseIntensity(value);
+                    }}
+                    min={0}
+                    max={24}
+                    label="Noise intensity"
+                    showValue={true}
+                  />
+                </div>
+              )}
+            </div>
+            
+            {/* Position */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Position</label>
+              <button 
+                onClick={handleShufflePositions}
+                className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Shuffle positions</span>
+              </button>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Elements */}
+      <div className="fixed bottom-0 left-0 right-0">
+        
+        {/* Cookie Consent Banner */}
+        <CookieBanner />
+      </div>
+
+      {/* Code Modal */}
+      <CodeModal 
+        isOpen={isCodeModalOpen}
+        onClose={() => setIsCodeModalOpen(false)}
+        cssCode={generatedCSS}
+      />
+
+      {/* Fullscreen Modal */}
+      {isFullscreen && (
+        <div className="fixed inset-0 z-50 animate-in fade-in duration-300">
+          {/* Close Button */}
+          <div className="absolute top-4 right-4 z-10">
+            <button
+              onClick={toggleFullscreen}
+              className="bg-white/10 hover:bg-white/20 text-white p-3 rounded-lg transition-all duration-200 backdrop-blur-sm group"
+              title="Exit fullscreen"
+            >
+              <svg 
+                className="w-6 h-6 group-hover:scale-110 transition-transform" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M6 18L18 6M6 6l12 12" 
+                />
+              </svg>
+            </button>
+          </div>
+          
+
+          {/* Fullscreen Gradient Display */}
+          <div className="w-full h-full" style={{ backgroundColor: backgroundColor }}>
+            <GradientGenerator 
+              key="fullscreen-static"
+              backgroundColor={backgroundColor}
+              hideControls={true}
+              meshPoints={getCurrentMeshPoints()}
+              onPointSelect={handlePointSelect}
+              gradientType={gradientType}
+              gradientAngle={gradientAngle}
+              addNoise={addNoise}
+              noiseIntensity={noiseIntensity}
+            />
+          </div>
+          
+        </div>
+      )}
+
+    </div>
+  );
+}

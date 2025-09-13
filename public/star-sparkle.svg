@@ -1,0 +1,44 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient definitions for the star -->
+    <radialGradient id="starGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="20%" style="stop-color:#00ff88;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#00dd66;stop-opacity:0.8" />
+      <stop offset="70%" style="stop-color:#00aa44;stop-opacity:0.4" />
+      <stop offset="100%" style="stop-color:#008822;stop-opacity:0" />
+    </radialGradient>
+
+    <!-- Glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle glow -->
+  <circle cx="100" cy="100" r="80" fill="url(#starGradient)" opacity="0.3"/>
+
+  <!-- Main star rays -->
+  <!-- Vertical ray -->
+  <line x1="100" y1="20" x2="100" y2="180" stroke="#00ff88" stroke-width="3" filter="url(#glow)" opacity="0.9"/>
+
+  <!-- Horizontal ray -->
+  <line x1="20" y1="100" x2="180" y2="100" stroke="#00ff88" stroke-width="3" filter="url(#glow)" opacity="0.9"/>
+
+  <!-- Diagonal rays -->
+  <line x1="35" y1="35" x2="165" y2="165" stroke="#00ff88" stroke-width="2" filter="url(#glow)" opacity="0.7"/>
+  <line x1="165" y1="35" x2="35" y2="165" stroke="#00ff88" stroke-width="2" filter="url(#glow)" opacity="0.7"/>
+
+  <!-- Additional smaller rays -->
+  <line x1="100" y1="30" x2="100" y2="170" stroke="#ffffff" stroke-width="1" filter="url(#glow)" opacity="0.8"/>
+  <line x1="30" y1="100" x2="170" y2="100" stroke="#ffffff" stroke-width="1" filter="url(#glow)" opacity="0.8"/>
+
+  <!-- Central bright core -->
+  <circle cx="100" cy="100" r="8" fill="#ffffff" filter="url(#glow)"/>
+  <circle cx="100" cy="100" r="4" fill="#00ff88"/>
+  <circle cx="100" cy="100" r="2" fill="#ffffff"/>
+</svg>

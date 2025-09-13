@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+:root {
+  --background: #111827;
+  --foreground: #ffffff;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Custom slider styles */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-track {
+  background: linear-gradient(to right, #374151, #6b7280);
+  height: 6px;
+  border-radius: 3px;
+  border: 1px solid #4b5563;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  margin-top: -7px;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  border-color: #f3f4f6;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
+}
+
+.slider::-moz-range-track {
+  background: linear-gradient(to right, #374151, #6b7280);
+  height: 6px;
+  border-radius: 3px;
+  border: 1px solid #4b5563;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.slider::-moz-range-thumb {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb:hover {
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  border-color: #f3f4f6;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
+}
+
+/* Disabled slider styling */
+.slider:disabled::-webkit-slider-track {
+  background: #374151;
+  opacity: 0.5;
+}
+
+.slider:disabled::-webkit-slider-thumb {
+  background: #6b7280;
+  border-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.slider:disabled::-moz-range-track {
+  background: #374151;
+  opacity: 0.5;
+}
+
+.slider:disabled::-moz-range-thumb {
+  background: #6b7280;
+  border-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Focus styles */
+*:focus {
+  outline: none;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #8b5cf6;
+  outline-offset: 2px;
+}
+
+/* Fade in out animation for reset text */
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(5px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-5px); }
+}
+
+.animate-fadeInOut {
+  animation: fadeInOut 1s ease-in-out;
+}
+
+/* Animated gradient for add color button */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
