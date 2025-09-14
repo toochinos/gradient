@@ -3,12 +3,14 @@
 import GradientGenerator, { GradientGeneratorRef, MeshPoint } from '@/components/GradientGenerator';
 import CookieBanner from '@/components/CookieBanner';
 import CodeModal from '@/components/CodeModal';
+import GradientExporter from '@/components/GradientExporter';
 import MuiBlurSlider from '@/components/MuiBlurSlider';
 import MuiAngleSlider from '@/components/MuiAngleSlider';
 import ColorPicker from '@/components/ColorPicker';
 import SketchColorPicker from '@/components/SketchColorPicker';
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { Camera, ImageUp, RemoveFormatting, Bot, Sparkles, Pipette, PaintRoller, FireExtinguisher, CircleDashed, Shapes, Copy } from 'lucide-react';
+import Link from 'next/link';
 import GIF from 'gif.js';
 import html2canvas from 'html2canvas';
 
@@ -43,6 +45,7 @@ const starTypes = [
 export default function Home() {
   const gradientRef = useRef<GradientGeneratorRef>(null);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [generatedCSS, setGeneratedCSS] = useState('');
   const [selectedColorId, setSelectedColorId] = useState<string | null>(null);
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
@@ -200,7 +203,7 @@ export default function Home() {
     }
     
     return keyframes;
-  }, [isAnimating, baseMeshPointsHash]);
+  }, [isAnimating, meshPoints]);
   const [currentKeyframe, setCurrentKeyframe] = useState(0);
   const [animationStartTime, setAnimationStartTime] = useState<number | null>(null);
   const keyframesGeneratedRef = useRef(false);
@@ -238,7 +241,7 @@ export default function Home() {
       setHistory([initialState]);
       setHistoryIndex(0);
     }
-  }, []);
+  }, [meshPoints, gradientType, gradientAngle, backgroundColor, history.length]);
 
   // Ensure client-side only operations
   useEffect(() => {
@@ -315,14 +318,28 @@ export default function Home() {
   const handleCodeButtonClick = () => {
     if (gradientRef.current) {
       let css = gradientRef.current.generateCSS();
-      
+
       // Add animation CSS if animation is active
       if (isAnimating && keyframesLengthRef.current > 0) {
         css += generateAnimationCSS();
       }
-      
+
       setGeneratedCSS(css);
       setIsCodeModalOpen(true);
+    }
+  };
+
+  const handleExportButtonClick = () => {
+    if (gradientRef.current) {
+      let css = gradientRef.current.generateCSS();
+
+      // Add animation CSS if animation is active
+      if (isAnimating && keyframesLengthRef.current > 0) {
+        css += generateAnimationCSS();
+      }
+
+      setGeneratedCSS(css);
+      setIsExportModalOpen(true);
     }
   };
 
@@ -1976,7 +1993,7 @@ export default function Home() {
       }));
       setMeshPoints(pointsWithNames);
     }
-  }, [gradientType, gradientAngle, backgroundColor, historyIndex]);
+  }, [meshPoints, gradientType, gradientAngle, backgroundColor, historyIndex]);
 
   const handlePointSelect = useCallback((pointId: string) => {
     setSelectedColorId(pointId);
@@ -2379,7 +2396,7 @@ export default function Home() {
           
           {/* Right side buttons */}
           <div className="flex items-center space-x-4">
-            <button className="text-gray-300 hover:text-white transition-colors">Upgrade</button>
+            <Link href="/upgrade" className="text-gray-300 hover:text-white transition-colors">Upgrade</Link>
             <button className="text-gray-300 hover:text-white transition-colors">Sign in</button>
             <button 
               className="text-gray-600 px-4 py-2 rounded-lg transition-colors relative overflow-hidden font-bold"
@@ -2409,7 +2426,7 @@ export default function Home() {
             </div>
             
             {/* Action Buttons */}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-2">
               <button 
                 onClick={handleGenerate}
                 disabled={isAnimating}
@@ -2420,7 +2437,7 @@ export default function Home() {
                 </svg>
                 <span>Generate</span>
               </button>
-              <button 
+              <button
                 onClick={handleCodeButtonClick}
                 className="flex items-center justify-center space-x-1 bg-gray-700 hover:bg-gray-600 text-white px-2 py-2 rounded-lg transition-colors text-sm"
               >
@@ -2428,6 +2445,15 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                 </svg>
                 <span>Code</span>
+              </button>
+              <button
+                onClick={handleExportButtonClick}
+                className="flex items-center justify-center space-x-1 bg-gray-700 hover:bg-gray-600 text-white px-2 py-2 rounded-lg transition-colors text-sm"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Export</span>
               </button>
               <button 
                 onClick={handleShufflePositions}
@@ -3559,12 +3585,35 @@ export default function Home() {
       </div>
 
       {/* Code Modal */}
-      <CodeModal 
+      <CodeModal
         isOpen={isCodeModalOpen}
         onClose={() => setIsCodeModalOpen(false)}
         cssCode={generatedCSS}
+        generateCSS={(format) => gradientRef.current?.generateCSS(format) || ''}
         hasAnimation={isAnimating && keyframesLengthRef.current > 0}
       />
+
+      {/* Export Modal */}
+      {isExportModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Export Gradient</h2>
+              <button
+                onClick={() => setIsExportModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-4">
+              <GradientExporter cssString={generatedCSS} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Fullscreen Modal */}
       {isFullscreen && (

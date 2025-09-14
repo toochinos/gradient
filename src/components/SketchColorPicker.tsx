@@ -101,7 +101,7 @@ export default function SketchColorPicker({ color, onChange, onClose }: SketchCo
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, dragOffset]);
+  }, [isDragging, dragOffset, handleMouseMove, handleMouseUp]);
 
   return (
     <div className="relative">

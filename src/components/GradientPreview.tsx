@@ -159,7 +159,7 @@ export default function GradientPreview({ css, overlays, onOverlaysUpdate, onCSS
       document.removeEventListener('touchmove', handleGlobalTouchMove);
       document.removeEventListener('touchend', handleGlobalTouchEnd);
     };
-  }, [isFullscreen, isDragging, artworkPosition, dragStart]);
+  }, [isFullscreen, isDragging, artworkPosition, dragStart, handleDragMove, handleDragEnd]);
 
   const toggleFullscreen = () => {
     const wasFullscreen = isFullscreen;

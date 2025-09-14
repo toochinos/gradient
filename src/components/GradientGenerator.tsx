@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useImperativeHandle, forwardRef, useEffect, JSX } from 'react';
+import Image from 'next/image';
 
 export interface MeshPoint {
   id: string;
@@ -104,7 +105,7 @@ interface GradientGeneratorProps {
 }
 
 export interface GradientGeneratorRef {
-  generateCSS: () => string;
+  generateCSS: (format?: 'html' | 'react' | 'css') => string;
   addMeshPoint: (color: string) => void;
   removeMeshPoint: (pointId: string) => void;
   getMeshPoints: () => MeshPoint[];
@@ -683,7 +684,7 @@ const GradientGenerator = forwardRef<GradientGeneratorRef, GradientGeneratorProp
     updateMeshPoints(newPoints);
   }, [meshPoints, updateMeshPoints]);
 
-  const generateMeshGradientCSS = () => {
+  const generateMeshGradientCSS = (format: 'html' | 'react' | 'css' = 'html') => {
     // Helper function for CSS color conversion
     const getRgbaFromColorCSS = (color: string, alpha: number) => {
       if (color.startsWith('hsl')) {
@@ -1038,11 +1039,61 @@ ${visiblePoints.map((_, index) => `  <div class="layer-${index + 1}"></div>`).jo
     }
 
     const noiseCSS = generateNoiseCSS();
-    return `${htmlStructure}\n\n/* CSS */\n${gradientCSS}${noiseCSS}`;
+    const fullCSS = `${gradientCSS}${noiseCSS}`;
+    
+    if (format === 'css') {
+      return fullCSS;
+    }
+    
+    if (format === 'react') {
+      const visiblePoints = meshPoints.filter(point => !point.hideColor);
+      const layerElements = visiblePoints.map((_, index) => 
+        `    <div className="individual-layer-${index + 1}"></div>`
+      ).join('\n');
+      
+      return `import React from 'react';
+
+const MeshGradient = () => {
+  return (
+    <div className="mesh-gradient">
+${layerElements}
+    </div>
+  );
+};
+
+export default MeshGradient;
+
+<style jsx>{\`
+${fullCSS}
+\`}</style>`;
+    }
+    
+    // HTML format (default)
+    const visiblePoints = meshPoints.filter(point => !point.hideColor);
+    const layerElements = visiblePoints.map((_, index) => 
+      `  <div class="individual-layer-${index + 1}"></div>`
+    ).join('\n');
+    
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesh Gradient</title>
+    <style>
+${fullCSS}
+    </style>
+</head>
+<body>
+    <div class="mesh-gradient">
+${layerElements}
+    </div>
+</body>
+</html>`;
   };
 
   useImperativeHandle(ref, () => ({
-    generateCSS: generateMeshGradientCSS,
+    generateCSS: (format: 'html' | 'react' | 'css' = 'html') => generateMeshGradientCSS(format),
     addMeshPoint: addMeshPoint,
     removeMeshPoint: removeMeshPoint,
     getMeshPoints: getMeshPoints,
@@ -1419,10 +1470,11 @@ ${visiblePoints.map((_, index) => `  <div class="layer-${index + 1}"></div>`).jo
                 }}
               >
                 {/* Image */}
-                <img
+                <Image
                   src={image.src}
                   alt="Uploaded"
-                  className="w-full h-full object-contain select-none"
+                  fill
+                  className="object-contain select-none"
                   draggable={false}
                   onMouseDown={(e) => handleImageMouseDown(e, image.id, 'drag')}
                 />

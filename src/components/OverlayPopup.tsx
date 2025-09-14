@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { CircularOverlay } from './GradientGenerator';
 import ColorPicker from './ColorPicker';
 import MuiBlurSlider from './MuiBlurSlider';
@@ -51,10 +52,12 @@ export default function OverlayPopup({
     >
       <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-2">
-          <img
+          <Image
             src="/star-sparkle.svg"
             alt="Shiny effect"
-            className="w-5 h-5 opacity-80 animate-pulse"
+            width={20}
+            height={20}
+            className="opacity-80 animate-pulse"
           />
           <h3 className="font-semibold text-sm text-gray-800">Overlay Controls</h3>
         </div>
