@@ -11,6 +11,7 @@ import SketchColorPicker from '@/components/SketchColorPicker';
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { Camera, ImageUp, RemoveFormatting, Bot, Sparkles, Pipette, PaintRoller, FireExtinguisher, CircleDashed, Shapes, Copy } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import GIF from 'gif.js';
 import html2canvas from 'html2canvas';
 
@@ -44,6 +45,13 @@ const starTypes = [
 
 export default function Home() {
   const gradientRef = useRef<GradientGeneratorRef>(null);
+  const router = useRouter();
+  
+  // Fast navigation handler
+  const handleUpgradeClick = useCallback(() => {
+    router.push('/upgrade');
+  }, [router]);
+  
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [generatedCSS, setGeneratedCSS] = useState('');
@@ -2396,7 +2404,7 @@ export default function Home() {
           
           {/* Right side buttons */}
           <div className="flex items-center space-x-4">
-            <Link href="/upgrade" className="text-gray-300 hover:text-white transition-colors">Upgrade</Link>
+            <Link href="/upgrade" className="text-gray-300 hover:text-white transition-colors" prefetch={true}>Upgrade</Link>
             <button className="text-gray-300 hover:text-white transition-colors">Sign in</button>
             <button 
               className="text-gray-600 px-4 py-2 rounded-lg transition-colors relative overflow-hidden font-bold"

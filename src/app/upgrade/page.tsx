@@ -1,20 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ArrowLeft, Check, Star, Download, FileText, Palette, Smartphone, Monitor, Zap, Heart, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 export default function UpgradePage() {
   const [isYearly, setIsYearly] = useState(false);
 
-  const features = [
+  const features = useMemo(() => [
     { icon: <Download className="w-5 h-5" />, text: "Export colors as images (.jpeg, .png, .svg)" },
     { icon: <Palette className="w-5 h-5" />, text: "Up to 3 collections" },
     { icon: <Star className="w-5 h-5" />, text: "Create and save unlimited colors" },
     { icon: <Heart className="w-5 h-5" />, text: "Like your favorite colors" }
-  ];
+  ], []);
 
-  const proFeatures = [
+  const proFeatures = useMemo(() => [
     { icon: <Check className="w-5 h-5" />, text: "Everything from free" },
     { icon: <Zap className="w-5 h-5" />, text: "AI features", isNew: true },
     { icon: <FileText className="w-5 h-5" />, text: "Export Branding Kit colors pdf file.", isNew: true },
@@ -25,7 +25,7 @@ export default function UpgradePage() {
     { icon: <FileText className="w-5 h-5" />, text: "Export to multiple formats (.json, .css, .csv)" },
     { icon: <Download className="w-5 h-5" />, text: "Export colors as images (.jpeg, .png, .svg)" },
     { icon: <Shield className="w-5 h-5" />, text: "Remove ads" }
-  ];
+  ], []);
 
 
   return (
@@ -389,7 +389,7 @@ export default function UpgradePage() {
           
           <div className="border-t border-gray-800 mt-6 pt-4 text-center text-gray-400 text-sm">
             <p>Made with a lot of ❤️ by the Gradient Master team</p>
-            <p className="mt-1">©2025 Gradient Master v1.0.0</p>
+            <p className="mt-1">©2025 Gradient Master V2.0</p>
           </div>
         </div>
       </footer>
