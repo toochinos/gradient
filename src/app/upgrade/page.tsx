@@ -374,7 +374,7 @@ export default function UpgradePage() {
                 Can I cancel my Gradient Master Pro subscription at any time?
               </h3>
               <p className="text-gray-400">
-                Yes, you can cancel or pause your subscription after the purchase. Go to your profile, select "Subscription," and cancel your account on the Stripe panel. If you're in the middle of a subscription, it will be canceled until the ongoing period ends.
+                Yes, you can cancel or pause your subscription after the purchase. Go to your profile, select &quot;Subscription,&quot; and cancel your account on the Stripe panel. If you&apos;re in the middle of a subscription, it will be canceled until the ongoing period ends.
               </p>
             </div>
             
