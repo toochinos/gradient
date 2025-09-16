@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Gradient Master",
   description: "Create beautiful mesh gradients with interactive controls - The ultimate gradient design tool",
-  viewport: "width=1200, initial-scale=0.5, maximum-scale=1, user-scalable=yes",
+  viewport: "width=1920, initial-scale=0.25, maximum-scale=5, user-scalable=yes",
 };
 
 export default function RootLayout({
@@ -25,6 +25,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="viewport" content="width=1920, initial-scale=0.25, maximum-scale=5, user-scalable=yes" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

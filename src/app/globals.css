@@ -20,45 +20,59 @@ body {
   user-select: none;
 }
 
-/* Desktop view for mobile devices */
+/* Force desktop view for mobile devices */
 @media (max-width: 768px) {
-  body {
-    -webkit-text-size-adjust: 100%;
-    -ms-text-size-adjust: 100%;
-    min-width: 1200px; /* Force desktop width */
+  html, body {
+    -webkit-text-size-adjust: none !important;
+    -ms-text-size-adjust: none !important;
+    min-width: 1920px !important; /* Force desktop width */
+    width: 1920px !important;
+    overflow-x: auto !important;
+  }
+  
+  /* Prevent mobile-specific behaviors */
+  * {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
   }
   
   /* Prevent zoom on input focus */
   input, textarea, select {
-    font-size: 16px !important;
+    font-size: 14px !important;
   }
   
-  /* Improve touch targets for desktop view */
+  /* Desktop-like touch targets */
   button, a, [role="button"] {
-    min-height: 32px;
-    min-width: 32px;
+    min-height: 28px !important;
+    min-width: 28px !important;
   }
   
-  /* Ensure gradient display maintains desktop layout */
+  /* Force desktop layout */
   .gradient-display {
-    min-height: 60vh !important;
+    min-height: 70vh !important;
     height: 100% !important;
   }
   
-  /* Fix layout for desktop view on mobile */
+  /* Desktop layout constraints */
   .flex.flex-col {
-    height: calc(100vh - 60px) !important;
+    height: calc(100vh - 40px) !important;
   }
   
-  /* Force desktop-like spacing and sizing */
+  /* Force desktop container */
   .container {
-    max-width: 1200px !important;
+    max-width: 1920px !important;
     margin: 0 auto !important;
+    padding: 0 20px !important;
   }
   
-  /* Ensure controls panel maintains desktop layout */
+  /* Desktop controls panel */
   .controls-panel {
-    min-width: 300px !important;
+    min-width: 400px !important;
+  }
+  
+  /* Prevent mobile viewport adjustments */
+  .main-content {
+    min-width: 1920px !important;
   }
   
   /* Ensure gradient preview area is visible */
