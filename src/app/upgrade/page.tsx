@@ -113,40 +113,24 @@ export default function UpgradePage() {
                   : 'border-gray-800 hover:border-gray-600'
               }`}
               style={selectedPlan === 'free' ? {
-                boxShadow: `
-                  0 0 15px rgba(255, 255, 0, 0.7),
-                  0 0 20px rgba(255, 0, 0, 0.6),
-                  0 0 25px rgba(255, 255, 0, 0.6),
-                  0 0 30px rgba(147, 51, 234, 0.5),
-                  0 0 35px rgba(255, 255, 0, 0.5),
-                  0 0 40px rgba(255, 255, 0, 0.4),
-                  0 0 45px rgba(255, 0, 0, 0.3),
-                  0 0 50px rgba(255, 255, 0, 0.3),
-                  0 0 55px rgba(255, 0, 0, 0.3),
-                  0 0 60px rgba(147, 51, 234, 0.3),
-                  0 0 65px rgba(255, 255, 0, 0.3),
-                  0 0 70px rgba(255, 255, 0, 0.2),
-                  0 0 75px rgba(255, 0, 0, 0.2),
-                  0 0 80px rgba(255, 255, 0, 0.2),
-                  0 0 85px rgba(255, 0, 0, 0.2),
-                  0 0 90px rgba(147, 51, 234, 0.2),
-                  0 0 95px rgba(255, 255, 0, 0.2),
-                  0 0 100px rgba(255, 255, 0, 0.1),
-                  inset 0 0 20px rgba(255, 255, 0, 0.2)
-                `,
-                filter: 'blur(0.5px)',
-                transform: 'scale(1.02)'
+                backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                textRendering: 'optimizeLegibility',
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                filter: 'none',
+                backdropFilter: 'none',
+                willChange: 'auto'
               } : {}}
               onClick={() => setSelectedPlan('free')}
             >
               <div className="text-center mb-6">
                 <div className="flex items-center justify-center mb-2">
-                  <h3 className="text-xl font-bold text-white">Basic</h3>
+                  <h3 className="text-xl font-bold text-white" style={selectedPlan === 'free' ? { textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', filter: 'none' } : {}}>Basic</h3>
                   {selectedPlan === 'free' && (
                     <Check className="w-5 h-5 text-purple-500 ml-2" />
                   )}
                 </div>
-                <div className="text-3xl font-bold text-white mb-2">FREE</div>
+                <div className="text-3xl font-bold text-white mb-2" style={selectedPlan === 'free' ? { textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', filter: 'none' } : {}}>FREE</div>
                 <div className="text-gray-400 text-sm">Forever</div>
               </div>
               
@@ -186,29 +170,13 @@ export default function UpgradePage() {
                   : 'border-gray-800 hover:border-gray-600'
               }`}
               style={selectedPlan === 'pro' ? {
-                boxShadow: `
-                  0 0 15px rgba(255, 255, 0, 0.7),
-                  0 0 20px rgba(255, 0, 0, 0.6),
-                  0 0 25px rgba(255, 255, 0, 0.6),
-                  0 0 30px rgba(147, 51, 234, 0.5),
-                  0 0 35px rgba(255, 255, 0, 0.5),
-                  0 0 40px rgba(255, 255, 0, 0.4),
-                  0 0 45px rgba(255, 0, 0, 0.3),
-                  0 0 50px rgba(255, 255, 0, 0.3),
-                  0 0 55px rgba(255, 0, 0, 0.3),
-                  0 0 60px rgba(147, 51, 234, 0.3),
-                  0 0 65px rgba(255, 255, 0, 0.3),
-                  0 0 70px rgba(255, 255, 0, 0.2),
-                  0 0 75px rgba(255, 0, 0, 0.2),
-                  0 0 80px rgba(255, 255, 0, 0.2),
-                  0 0 85px rgba(255, 0, 0, 0.2),
-                  0 0 90px rgba(147, 51, 234, 0.2),
-                  0 0 95px rgba(255, 255, 0, 0.2),
-                  0 0 100px rgba(255, 255, 0, 0.1),
-                  inset 0 0 20px rgba(255, 255, 0, 0.2)
-                `,
-                filter: 'blur(0.5px)',
-                transform: 'scale(1.02)'
+                backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                textRendering: 'optimizeLegibility',
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                filter: 'none',
+                backdropFilter: 'none',
+                willChange: 'auto'
               } : {}}
               onClick={() => setSelectedPlan('pro')}
             >
@@ -220,12 +188,12 @@ export default function UpgradePage() {
               
               <div className="text-center mb-6">
                 <div className="flex items-center justify-center mb-2">
-                  <h3 className="text-xl font-bold text-white">Pro</h3>
+                  <h3 className="text-xl font-bold text-white" style={selectedPlan === 'pro' ? { textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', filter: 'none' } : {}}>Pro</h3>
                   {selectedPlan === 'pro' && (
                     <Check className="w-5 h-5 text-purple-500 ml-2" />
                   )}
                 </div>
-                <div className="text-3xl font-bold text-white mb-2">
+                <div className="text-3xl font-bold text-white mb-2" style={selectedPlan === 'pro' ? { textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', filter: 'none' } : {}}>
                   ${isYearly ? '3.33' : '5'}
                 </div>
                 <div className="text-gray-400 text-sm">/{isYearly ? 'month' : 'month'}</div>
