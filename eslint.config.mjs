@@ -21,6 +21,11 @@ const eslintConfig = [
       "public/gif.worker.js",
     ],
   },
+  {
+    rules: {
+      "react/no-unescaped-entities": "off"
+    },
+  },
 ];
 
 export default eslintConfig;
