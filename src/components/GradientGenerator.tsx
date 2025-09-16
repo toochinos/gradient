@@ -318,6 +318,39 @@ const GradientGenerator = forwardRef<GradientGeneratorRef, GradientGeneratorProp
     setIsDragging(null);
   }, []);
 
+  // Touch event handlers for gradient circles
+  const handleTouchStart = useCallback((e: React.TouchEvent, pointId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(pointId);
+    if (onPointSelect) {
+      onPointSelect(pointId);
+    }
+  }, [onPointSelect]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isDragging || !containerRef.current) return;
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((touch.clientY - rect.top) / rect.height) * 100));
+
+    const newPoints = meshPoints.map(point => 
+      point.id === isDragging ? { ...point, x, y } : point
+    );
+    updateMeshPoints(newPoints);
+  }, [isDragging, meshPoints, updateMeshPoints]);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(null);
+  }, []);
+
   // Drawing handlers
   const handleDrawingMouseDown = useCallback((e: React.MouseEvent) => {
     if (!isDrawingMode || !containerRef.current) return;
@@ -602,16 +635,20 @@ const GradientGenerator = forwardRef<GradientGeneratorRef, GradientGeneratorProp
   const handleCombinedTouchMove = useCallback((e: React.TouchEvent) => {
     if (isDrawingMode) {
       handleDrawingTouchMove(e);
+    } else if (isDragging) {
+      handleTouchMove(e);
     }
     // Don't handle regular touch move in drawing mode to prevent conflicts
-  }, [isDrawingMode, handleDrawingTouchMove]);
+  }, [isDrawingMode, handleDrawingTouchMove, isDragging, handleTouchMove]);
 
-  const handleCombinedTouchEnd = useCallback(() => {
+  const handleCombinedTouchEnd = useCallback((e: React.TouchEvent) => {
     if (isDrawingMode) {
       handleDrawingTouchEnd();
+    } else if (isDragging) {
+      handleTouchEnd(e);
     }
     // Don't handle regular touch end in drawing mode to prevent conflicts
-  }, [isDrawingMode, handleDrawingTouchEnd]);
+  }, [isDrawingMode, handleDrawingTouchEnd, isDragging, handleTouchEnd]);
 
   const addMeshPoint = useCallback((color: string) => {
     const newPoint: MeshPoint = {
@@ -1300,13 +1337,16 @@ ${layerElements}
     <div className="w-full h-full">
       <div 
         ref={containerRef}
-        className={`gradient-display relative w-full h-full overflow-hidden ${
+        className={`gradient-display relative w-full h-full overflow-hidden select-none ${
           hideControls ? 'cursor-default' : 
           isDrawingMode ? 'cursor-crosshair' : 
           'cursor-crosshair'
         }`}
         style={{
-          backgroundColor: backgroundColor
+          backgroundColor: backgroundColor,
+          touchAction: 'none',
+          WebkitUserSelect: 'none',
+          userSelect: 'none'
         }}
         onMouseDown={hideControls ? undefined : handleCombinedMouseDown}
         onMouseMove={hideControls ? undefined : handleCombinedMouseMove}
@@ -1535,7 +1575,7 @@ ${layerElements}
         {!hideControls && meshPoints.filter(point => !point.hideBalls).map((point) => (
           <div
             key={point.id}
-            className="absolute w-6 h-6 border-2 border-white rounded-full cursor-move shadow-lg transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 transition-transform"
+            className="absolute w-8 h-8 sm:w-6 sm:h-6 border-2 border-white rounded-full cursor-move shadow-lg transform -translate-x-1/2 -translate-y-1/2 hover:scale-110 active:scale-125 transition-transform touch-manipulation"
             style={{
               left: `${point.x}%`,
               top: `${point.y}%`,
@@ -1543,6 +1583,7 @@ ${layerElements}
               zIndex: 50, // Below images but above gradient layers
             }}
             onMouseDown={(e) => handleMouseDown(e, point.id)}
+            onTouchStart={(e) => handleTouchStart(e, point.id)}
           />
         ))}
         

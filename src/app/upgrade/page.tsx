@@ -106,398 +106,243 @@ export default function UpgradePage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {/* Basic Plan */}
-            <div 
-              className={`bg-gray-900 rounded-xl shadow-lg p-6 border-2 cursor-pointer transition-all ${
-                selectedPlan === 'free' 
-                  ? 'border-purple-500' 
-                  : 'border-gray-800 hover:border-gray-600'
-              }`}
-              style={selectedPlan === 'free' ? {
-                backgroundColor: 'rgba(147, 51, 234, 0.1)',
-                textRendering: 'optimizeLegibility',
-                WebkitFontSmoothing: 'antialiased',
-                MozOsxFontSmoothing: 'grayscale',
-                filter: 'none',
-                backdropFilter: 'none',
-                willChange: 'auto'
-              } : {}}
-              onClick={() => setSelectedPlan('free')}
-            >
-              <div className="text-center mb-6">
-                <div className="flex items-center justify-center mb-2">
-                  <h3 className="text-xl font-bold text-white" style={selectedPlan === 'free' ? { textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', filter: 'none' } : {}}>Basic</h3>
-                  {selectedPlan === 'free' && (
-                    <Check className="w-5 h-5 text-purple-500 ml-2" />
-                  )}
-                </div>
-                <div className="text-3xl font-bold text-white mb-2" style={selectedPlan === 'free' ? { textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', filter: 'none' } : {}}>FREE</div>
-                <div className="text-gray-400 text-sm">Forever</div>
-              </div>
-              
-              <p className="text-gray-400 mb-6 text-center text-sm">
-                For developers, designers, and color lovers building simple apps or projects.
-              </p>
-              
-              <button 
-                className={`w-full py-2 rounded-lg font-semibold transition-colors mb-6 text-sm ${
-                  selectedPlan === 'free'
-                    ? 'bg-purple-600 text-white hover:bg-purple-700'
-                    : 'bg-gray-800 text-white hover:bg-gray-700'
+            <div className="relative">
+              {/* Background card with blur effect */}
+              <div 
+                className={`bg-gray-900 rounded-xl shadow-lg p-6 border-2 cursor-pointer transition-all ${
+                  selectedPlan === 'free' 
+                    ? 'border-purple-500' 
+                    : 'border-gray-800 hover:border-gray-600'
                 }`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedPlan('free');
-                }}
+                style={selectedPlan === 'free' ? {
+                  backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                  boxShadow: '0 0 30px rgba(147, 51, 234, 0.4)',
+                  filter: 'blur(1px)'
+                } : {}}
+                onClick={() => setSelectedPlan('free')}
               >
-                {selectedPlan === 'free' ? 'Selected' : 'Get started for free'}
-              </button>
-              
-              <div className="space-y-3">
-                {features.map((feature, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <div className="text-green-500 text-sm">{feature.icon}</div>
-                    <span className="text-gray-300 text-sm">{feature.text}</span>
+                <div className="text-center mb-6">
+                  <div className="flex items-center justify-center mb-2">
+                    <h3 className="text-xl font-bold text-white">Basic</h3>
+                    {selectedPlan === 'free' && (
+                      <Check className="w-5 h-5 text-purple-500 ml-2" />
+                    )}
                   </div>
-                ))}
+                  <div className="text-3xl font-bold text-white mb-2">FREE</div>
+                  <div className="text-gray-400 text-sm">Forever</div>
+                </div>
+                
+                <p className="text-gray-400 mb-6 text-center text-sm">
+                  For developers, designers, and color lovers building simple apps or projects.
+                </p>
+                
+                <button 
+                  className={`w-full py-2 rounded-lg font-semibold transition-colors mb-6 text-sm ${
+                    selectedPlan === 'free'
+                      ? 'bg-purple-600 text-white hover:bg-purple-700'
+                      : 'bg-gray-800 text-white hover:bg-gray-700'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPlan('free');
+                  }}
+                >
+                  {selectedPlan === 'free' ? 'Selected' : 'Get started for free'}
+                </button>
+                
+                <div className="space-y-3">
+                  {features.map((feature, index) => (
+                    <div key={index} className="flex items-center space-x-3">
+                      <div className="text-green-500 text-sm">{feature.icon}</div>
+                      <span className="text-gray-300 text-sm">{feature.text}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
+              
+              {/* Clear overlay card when selected */}
+              {selectedPlan === 'free' && (
+                <div 
+                  className="absolute inset-0 bg-gray-900 rounded-xl p-6 border-2 border-purple-500 cursor-pointer"
+                  style={{
+                    textRendering: 'optimizeLegibility',
+                    WebkitFontSmoothing: 'antialiased',
+                    MozOsxFontSmoothing: 'grayscale',
+                    filter: 'none',
+                    backdropFilter: 'none'
+                  }}
+                  onClick={() => setSelectedPlan('free')}
+                >
+                  <div className="text-center mb-6">
+                    <div className="flex items-center justify-center mb-2">
+                      <h3 className="text-xl font-bold text-white">Basic</h3>
+                      <Check className="w-5 h-5 text-purple-500 ml-2" />
+                    </div>
+                    <div className="text-3xl font-bold text-white mb-2">FREE</div>
+                    <div className="text-gray-400 text-sm">Forever</div>
+                  </div>
+                  
+                  <p className="text-gray-400 mb-6 text-center text-sm">
+                    For developers, designers, and color lovers building simple apps or projects.
+                  </p>
+                  
+                  <button 
+                    className="w-full py-2 rounded-lg font-semibold transition-colors mb-6 text-sm bg-purple-600 text-white hover:bg-purple-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPlan('free');
+                    }}
+                  >
+                    Selected
+                  </button>
+                  
+                  <div className="space-y-3">
+                    {features.map((feature, index) => (
+                      <div key={index} className="flex items-center space-x-3">
+                        <div className="text-green-500 text-sm">{feature.icon}</div>
+                        <span className="text-gray-300 text-sm">{feature.text}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Pro Plan */}
-            <div 
-              className={`bg-gray-900 rounded-xl shadow-lg p-6 border-2 relative cursor-pointer transition-all ${
-                selectedPlan === 'pro' 
-                  ? 'border-purple-500' 
-                  : 'border-gray-800 hover:border-gray-600'
-              }`}
-              style={selectedPlan === 'pro' ? {
-                backgroundColor: 'rgba(147, 51, 234, 0.1)',
-                textRendering: 'optimizeLegibility',
-                WebkitFontSmoothing: 'antialiased',
-                MozOsxFontSmoothing: 'grayscale',
-                filter: 'none',
-                backdropFilter: 'none',
-                willChange: 'auto'
-              } : {}}
-              onClick={() => setSelectedPlan('pro')}
-            >
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                  Most Popular
-                </span>
-              </div>
-              
-              <div className="text-center mb-6">
-                <div className="flex items-center justify-center mb-2">
-                  <h3 className="text-xl font-bold text-white" style={selectedPlan === 'pro' ? { textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', filter: 'none' } : {}}>Pro</h3>
-                  {selectedPlan === 'pro' && (
-                    <Check className="w-5 h-5 text-purple-500 ml-2" />
-                  )}
-                </div>
-                <div className="text-3xl font-bold text-white mb-2" style={selectedPlan === 'pro' ? { textRendering: 'optimizeLegibility', WebkitFontSmoothing: 'antialiased', MozOsxFontSmoothing: 'grayscale', filter: 'none' } : {}}>
-                  ${isYearly ? '3.33' : '5'}
-                </div>
-                <div className="text-gray-400 text-sm">/{isYearly ? 'month' : 'month'}</div>
-              </div>
-              
-              <p className="text-gray-400 mb-6 text-center text-sm">
-                For individuals who need more solutions and features to build and grow their projects.
-              </p>
-              
-              <button 
-                className={`w-full py-2 rounded-lg font-semibold transition-colors mb-6 text-sm ${
-                  selectedPlan === 'pro'
-                    ? 'bg-purple-600 text-white hover:bg-purple-700'
-                    : 'bg-purple-600 text-white hover:bg-purple-700'
+            <div className="relative">
+              {/* Background card with blur effect */}
+              <div 
+                className={`bg-gray-900 rounded-xl shadow-lg p-6 border-2 relative cursor-pointer transition-all ${
+                  selectedPlan === 'pro' 
+                    ? 'border-purple-500' 
+                    : 'border-gray-800 hover:border-gray-600'
                 }`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedPlan('pro');
-                }}
+                style={selectedPlan === 'pro' ? {
+                  backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                  boxShadow: '0 0 30px rgba(147, 51, 234, 0.4)',
+                  filter: 'blur(1px)'
+                } : {}}
+                onClick={() => setSelectedPlan('pro')}
               >
-                {selectedPlan === 'pro' ? 'Selected' : 'Get PRO'}
-              </button>
-              
-              <div className="space-y-3">
-                {proFeatures.map((feature, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <div className="text-green-500 text-sm">{feature.icon}</div>
-                    <span className="text-gray-300 text-sm flex items-center">
-                      {feature.text}
-                      {feature.isNew && (
-                        <span className="ml-2 bg-green-600 text-white text-xs px-2 py-1 rounded-full">
-                          New
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      {/* Features Comparison */}
-      <section className="py-8 bg-black">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center text-white mb-6">
-            Compare plans and features
-          </h2>
-          
-          <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-800">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-white">Plans</th>
-                    <th className="px-4 py-3 text-center text-xs font-semibold text-white">
-                      <div>Free</div>
-                      <div className="text-xs text-gray-400">Forever</div>
-                      <button 
-                        className={`mt-1 px-3 py-1 rounded text-xs transition-colors ${
-                          selectedPlan === 'free'
-                            ? 'bg-purple-600 text-white hover:bg-purple-700'
-                            : 'bg-gray-700 text-white hover:bg-gray-600'
-                        }`}
-                        onClick={() => setSelectedPlan('free')}
-                      >
-                        {selectedPlan === 'free' ? 'Selected' : 'Get started for free'}
-                      </button>
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-semibold text-white">
-                      <div>Pro</div>
-                      <div className="text-xs text-gray-400">$5/month</div>
-                      <button 
-                        className={`mt-1 px-3 py-1 rounded text-xs transition-colors ${
-                          selectedPlan === 'pro'
-                            ? 'bg-purple-600 text-white hover:bg-purple-700'
-                            : 'bg-gray-700 text-white hover:bg-gray-600'
-                        }`}
-                        onClick={() => setSelectedPlan('pro')}
-                      >
-                        {selectedPlan === 'pro' ? 'Selected' : 'Get PRO'}
-                      </button>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-700">
-                  <tr>
-                    <td className="px-4 py-3 font-semibold text-white text-sm">Content & Tools</td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2 text-gray-300 text-sm">Access to all tools</td>
-                    <td className="px-4 py-2 text-center"><Check className="w-4 h-4 text-green-500 mx-auto" /></td>
-                    <td className="px-4 py-2 text-center"><Check className="w-4 h-4 text-green-500 mx-auto" /></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2 text-gray-300 text-sm">Access to featured gradients / palettes</td>
-                    <td className="px-4 py-2 text-center"><Check className="w-4 h-4 text-green-500 mx-auto" /></td>
-                    <td className="px-4 py-2 text-center"><Check className="w-4 h-4 text-green-500 mx-auto" /></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2 text-gray-300 text-sm">Early access to new tools & features</td>
-                    <td className="px-4 py-2 text-center"><span className="text-gray-500">✗</span></td>
-                    <td className="px-4 py-2 text-center"><Check className="w-4 h-4 text-green-500 mx-auto" /></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2 text-gray-300 text-sm">App color tokens (Android, Flutter, Swift UI, .NET MAUI)</td>
-                    <td className="px-4 py-2 text-center"><span className="text-gray-500">✗</span></td>
-                    <td className="px-4 py-2 text-center"><Check className="w-4 h-4 text-green-500 mx-auto" /></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-3 font-semibold text-white text-sm">Features</td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2 text-gray-300 text-sm">Create & save gradients</td>
-                    <td className="px-4 py-2 text-center text-gray-300 text-sm">Unlimited</td>
-                    <td className="px-4 py-2 text-center text-gray-300 text-sm">Unlimited</td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2 text-gray-300 text-sm">Remove ads</td>
-                    <td className="px-4 py-2 text-center"><span className="text-gray-500">✗</span></td>
-                    <td className="px-4 py-2 text-center"><Check className="w-4 h-4 text-green-500 mx-auto" /></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2 text-gray-300 text-sm">Export your colors to .json, .css, .csv</td>
-                    <td className="px-4 py-2 text-center"><span className="text-gray-500">✗</span></td>
-                    <td className="px-4 py-2 text-center"><Check className="w-4 h-4 text-green-500 mx-auto" /></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2 text-gray-300 text-sm">AI features (color use cases, analysis, and more soon.)</td>
-                    <td className="px-4 py-2 text-center"><span className="text-gray-500">✗</span></td>
-                    <td className="px-4 py-2 text-center"><Check className="w-4 h-4 text-green-500 mx-auto" /></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-2 text-gray-300 text-sm">Collections</td>
-                    <td className="px-4 py-2 text-center text-gray-300 text-sm">Up to 3 collections</td>
-                    <td className="px-4 py-2 text-center text-gray-300 text-sm">Unlimited</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="py-8 bg-black">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center text-white mb-6">
-            Frequently asked questions
-          </h2>
-          
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-2">What is Gradient Master?</h3>
-              <p className="text-gray-400 text-sm">
-                Gradient Master is the easiest CSS gradient generator. We are one of the most intuitive tools to generate CSS-ready gradients, palettes, dark themes, color schemes, and more!
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-2">How often do you upload new colors?</h3>
-              <p className="text-gray-400 text-sm">
-                Commonly, we upload and update new colors every week, sometimes every two weeks. But you can still see and like all the current colors or add your favorites to a collection.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-2">Is there a free plan?</h3>
-              <p className="text-gray-400 text-sm">
-                Yes! We do have a free plan. The free plan allows you to use the basic functionality of Gradient Master, like all the tools, to create and save unlimited gradients & palettes.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-2">Can I cancel my Gradient Master Pro subscription at any time?</h3>
-              <p className="text-gray-400 text-sm">
-                Yes, you can cancel or pause your subscription after the purchase. Go to your profile, select &quot;Subscription,&quot; and cancel your account on the Stripe panel.
-                If you&apos;re in the middle of a subscription, it will be canceled until the ongoing period ends.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-2">Is the payment secure?</h3>
-              <p className="text-gray-400 text-sm">
-                Yes, all the payments are powered and secure by Stripe Checkout. It is a hosted payment page by Stripe.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-8 bg-gradient-to-br from-purple-600 to-blue-600 text-white">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-2xl font-bold mb-4">
-            Upgrade to Pro and unlock more features.
-          </h2>
-          <p className="text-lg mb-6 opacity-90">
-            Trusted and used by designers and developers from companies around the world.
-          </p>
-          
-          
-          <h3 className="text-xl font-bold mb-3">Create. Export. Build faster.</h3>
-          <p className="text-base mb-6 opacity-90">
-            Get access to more export file formats, app tokens, remove ads, unlimited collections, and more.
-          </p>
-          
-          <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto mb-6">
-            <div className="text-left">
-              {proFeatures.slice(0, 5).map((feature, index) => (
-                <div key={index} className="flex items-center space-x-2 mb-2">
-                  <Check className="w-4 h-4" />
-                  <span className="flex items-center text-sm">
-                    {feature.text}
-                    {feature.isNew && (
-                      <span className="ml-2 bg-green-500 text-white text-xs px-1 py-0.5 rounded-full">
-                        New
-                      </span>
-                    )}
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    Most Popular
                   </span>
                 </div>
-              ))}
-            </div>
-            <div className="text-left">
-              {proFeatures.slice(5).map((feature, index) => (
-                <div key={index} className="flex items-center space-x-2 mb-2">
-                  <Check className="w-4 h-4" />
-                  <span className="text-sm">{feature.text}</span>
+                
+                <div className="text-center mb-6">
+                  <div className="flex items-center justify-center mb-2">
+                    <h3 className="text-xl font-bold text-white">Pro</h3>
+                    {selectedPlan === 'pro' && (
+                      <Check className="w-5 h-5 text-purple-500 ml-2" />
+                    )}
+                  </div>
+                  <div className="text-3xl font-bold text-white mb-2">
+                    ${isYearly ? '3.33' : '5'}
+                  </div>
+                  <div className="text-gray-400 text-sm">/{isYearly ? 'month' : 'month'}</div>
                 </div>
-              ))}
+                
+                <p className="text-gray-400 mb-6 text-center text-sm">
+                  For professionals and teams who need advanced features and unlimited access.
+                </p>
+                
+                <button 
+                  className={`w-full py-2 rounded-lg font-semibold transition-colors mb-6 text-sm ${
+                    selectedPlan === 'pro'
+                      ? 'bg-purple-600 text-white hover:bg-purple-700'
+                      : 'bg-gray-800 text-white hover:bg-gray-700'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPlan('pro');
+                  }}
+                >
+                  {selectedPlan === 'pro' ? 'Selected' : 'Get PRO'}
+                </button>
+                
+                <div className="space-y-3">
+                  {proFeatures.map((feature, index) => (
+                    <div key={index} className="flex items-center space-x-3">
+                      <div className="text-green-500 text-sm">{feature.icon}</div>
+                      <span className="text-gray-300 text-sm flex items-center">
+                        {feature.text}
+                        {feature.isNew && (
+                          <span className="ml-2 bg-green-600 text-white text-xs px-2 py-1 rounded-full">
+                            New
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Clear overlay card when selected */}
+              {selectedPlan === 'pro' && (
+                <div 
+                  className="absolute inset-0 bg-gray-900 rounded-xl p-6 border-2 border-purple-500 cursor-pointer"
+                  style={{
+                    textRendering: 'optimizeLegibility',
+                    WebkitFontSmoothing: 'antialiased',
+                    MozOsxFontSmoothing: 'grayscale',
+                    filter: 'none',
+                    backdropFilter: 'none'
+                  }}
+                  onClick={() => setSelectedPlan('pro')}
+                >
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      Most Popular
+                    </span>
+                  </div>
+                  
+                  <div className="text-center mb-6">
+                    <div className="flex items-center justify-center mb-2">
+                      <h3 className="text-xl font-bold text-white">Pro</h3>
+                      <Check className="w-5 h-5 text-purple-500 ml-2" />
+                    </div>
+                    <div className="text-3xl font-bold text-white mb-2">
+                      ${isYearly ? '3.33' : '5'}
+                    </div>
+                    <div className="text-gray-400 text-sm">/{isYearly ? 'month' : 'month'}</div>
+                  </div>
+                  
+                  <p className="text-gray-400 mb-6 text-center text-sm">
+                    For professionals and teams who need advanced features and unlimited access.
+                  </p>
+                  
+                  <button 
+                    className="w-full py-2 rounded-lg font-semibold transition-colors mb-6 text-sm bg-purple-600 text-white hover:bg-purple-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPlan('pro');
+                    }}
+                  >
+                    Selected
+                  </button>
+                  
+                  <div className="space-y-3">
+                    {proFeatures.map((feature, index) => (
+                      <div key={index} className="flex items-center space-x-3">
+                        <div className="text-green-500 text-sm">{feature.icon}</div>
+                        <span className="text-gray-300 text-sm flex items-center">
+                          {feature.text}
+                          {feature.isNew && (
+                            <span className="ml-2 bg-green-600 text-white text-xs px-2 py-1 rounded-full">
+                              New
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-          
-          <button 
-            className={`px-6 py-3 rounded-lg font-semibold text-base transition-colors ${
-              selectedPlan === 'free'
-                ? 'bg-purple-600 text-white hover:bg-purple-700'
-                : 'bg-white text-purple-600 hover:bg-gray-100'
-            }`}
-            onClick={() => {
-              if (selectedPlan === 'free') {
-                // Handle free plan selection
-                console.log('Free plan selected');
-              } else {
-                // Handle pro plan selection
-                console.log('Pro plan selected');
-              }
-            }}
-          >
-            {selectedPlan === 'free' 
-              ? 'Continue with Free Plan' 
-              : `Upgrade to Pro for $${isYearly ? '3.33' : '5'}/mo`
-            }
-          </button>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-6">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-6">
-            <div>
-              <h3 className="text-base font-semibold mb-3">Gradient Master</h3>
-              <p className="text-gray-400 text-sm">contact@gradientmaster.com</p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Product</h4>
-              <ul className="space-y-1 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white">Pricing</a></li>
-                <li><a href="#" className="hover:text-white">Updates</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">About Us</h4>
-              <ul className="space-y-1 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white">Give Feedback</a></li>
-                <li><a href="#" className="hover:text-white">Team</a></li>
-                <li><a href="#" className="hover:text-white">Help & Support</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-3 text-sm">Resources</h4>
-              <ul className="space-y-1 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white">Blog</a></li>
-                <li><a href="#" className="hover:text-white">Jobs</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-6 pt-4 text-center text-gray-400 text-sm">
-            <p>Made with a lot of ❤️ by the Gradient Master team</p>
-            <p className="mt-1">©2025 Gradient Master V2.0</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
