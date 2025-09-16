@@ -2502,7 +2502,7 @@ export default function Home() {
       )}
 
       {/* Main Content Area */}
-      <div className="flex h-[calc(100vh-73px)]">
+      <div className="flex flex-col md:flex-row h-[calc(100vh-80px)] md:h-[calc(100vh-73px)] min-h-0">
         {/* Left Control Panel - Hidden on mobile */}
         <div className="hidden md:block w-80 bg-gray-800 border-r border-gray-700 p-6 overflow-y-auto overflow-x-visible">
           <div className="space-y-6">
@@ -3129,7 +3129,7 @@ export default function Home() {
 
         {/* Center Gradient Preview Area */}
         <div 
-          className="flex-1 overflow-hidden relative -mt-4 md:mt-0" 
+          className="flex-1 w-full h-full md:h-full overflow-hidden relative -mt-4 md:mt-0 min-h-0 gradient-preview-area" 
           style={{ backgroundColor: backgroundColor }}
           onClick={handleGradientClick}
         >

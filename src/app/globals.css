@@ -37,6 +37,24 @@ body {
     min-height: 44px;
     min-width: 44px;
   }
+  
+  /* Ensure gradient display is visible on mobile */
+  .gradient-display {
+    min-height: 50vh !important;
+    height: 100% !important;
+  }
+  
+  /* Fix mobile layout issues */
+  .flex.flex-col {
+    height: calc(100vh - 80px) !important;
+  }
+  
+  /* Ensure gradient preview area is visible */
+  .gradient-preview-area {
+    min-height: 60vh !important;
+    height: 100% !important;
+    flex: 1 1 auto !important;
+  }
 }
 
 /* Custom slider styles */
