@@ -504,7 +504,7 @@ export default function UpgradePage() {
               Made with a lot of ❤️ by the Gradient Master team
             </p>
             <p className="text-gray-400 text-sm mt-2">
-              ©2025 Gradient Master V2.0
+              ©2025 Gradient Master V2
             </p>
           </div>
         </div>

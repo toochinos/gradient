@@ -2302,7 +2302,7 @@ export default function Home() {
                 <span 
                   className="absolute bottom-2 right-3 text-xs text-white/70 font-medium"
                 >
-                  V2.0
+                  V2
                 </span>
               </div>
             </div>
