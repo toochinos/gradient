@@ -183,6 +183,85 @@ body {
     padding-top: 44px !important;
   }
   
+  /* Adjust body content for mobile landscape */
+  body {
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+  
+  /* Main content area adjustments */
+  .main-content {
+    height: calc(100vh - 44px) !important;
+    min-height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+    overflow: hidden !important;
+  }
+  
+  /* Tools panel adjustments for mobile landscape */
+  .tools-panel, .controls-panel {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 8px !important;
+  }
+  
+  /* Gradient display area adjustments */
+  .gradient-display, .gradient-preview-area {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+    min-height: calc(100vh - 44px) !important;
+    overflow: hidden !important;
+  }
+  
+  /* Flex container adjustments */
+  .flex.flex-col, .flex.flex-row {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+  }
+  
+  /* Ensure no content overflows */
+  .container, .main-container {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+    overflow: hidden !important;
+  }
+  
+  /* Specific adjustments for gradient generator components */
+  .gradient-generator-container {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+  }
+  
+  /* Canvas and SVG elements */
+  canvas, svg {
+    max-height: calc(100vh - 44px) !important;
+    height: auto !important;
+  }
+  
+  /* Sidebar and control panels */
+  .sidebar, .control-sidebar {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Button groups and toolbars */
+  .toolbar, .button-group {
+    padding: 4px !important;
+    gap: 2px !important;
+  }
+  
+  /* Form elements and inputs */
+  .form-group, .input-group {
+    margin-bottom: 8px !important;
+  }
+  
+  input, select, textarea {
+    padding: 4px 6px !important;
+    font-size: 12px !important;
+  }
+  
   /* Ensure gradient preview area is visible */
   .gradient-preview-area {
     min-height: 60vh !important;
