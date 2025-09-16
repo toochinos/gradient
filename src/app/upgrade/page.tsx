@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 export default function UpgradePage() {
   const [isYearly, setIsYearly] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<'free' | 'pro'>('pro');
 
   const features = useMemo(() => [
     { icon: <Download className="w-5 h-5" />, text: "Export colors as images (.jpeg, .png, .svg)" },
@@ -62,9 +63,16 @@ export default function UpgradePage() {
           <h1 className="text-3xl font-bold text-white mb-4">
             Simple pricing, start for free and upgrade anytime.
           </h1>
-          <p className="text-lg text-gray-400 mb-6">
+          <p className="text-lg text-gray-400 mb-4">
             Get access to all the new features of Gradient Master. Cancel anytime. Price in USD.
           </p>
+          <div className="mb-6">
+            <p className="text-sm text-gray-300">
+              Currently selected: <span className="font-semibold text-purple-400">
+                {selectedPlan === 'free' ? 'Free Plan' : 'Pro Plan'}
+              </span>
+            </p>
+          </div>
           
           {/* Toggle */}
           <div className="flex items-center justify-center space-x-4 mb-8">
@@ -72,7 +80,10 @@ export default function UpgradePage() {
               Monthly
             </span>
             <button
-              onClick={() => setIsYearly(!isYearly)}
+              onClick={() => {
+                setIsYearly(!isYearly);
+                setSelectedPlan('pro');
+              }}
               className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                 isYearly ? 'bg-purple-600' : 'bg-gray-600'
               }`}
@@ -95,9 +106,46 @@ export default function UpgradePage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
             {/* Basic Plan */}
-            <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-gray-800">
+            <div 
+              className={`bg-gray-900 rounded-xl shadow-lg p-6 border-2 cursor-pointer transition-all ${
+                selectedPlan === 'free' 
+                  ? 'border-purple-500' 
+                  : 'border-gray-800 hover:border-gray-600'
+              }`}
+              style={selectedPlan === 'free' ? {
+                boxShadow: `
+                  0 0 15px rgba(255, 255, 0, 0.7),
+                  0 0 20px rgba(255, 0, 0, 0.6),
+                  0 0 25px rgba(255, 255, 0, 0.6),
+                  0 0 30px rgba(147, 51, 234, 0.5),
+                  0 0 35px rgba(255, 255, 0, 0.5),
+                  0 0 40px rgba(255, 255, 0, 0.4),
+                  0 0 45px rgba(255, 0, 0, 0.3),
+                  0 0 50px rgba(255, 255, 0, 0.3),
+                  0 0 55px rgba(255, 0, 0, 0.3),
+                  0 0 60px rgba(147, 51, 234, 0.3),
+                  0 0 65px rgba(255, 255, 0, 0.3),
+                  0 0 70px rgba(255, 255, 0, 0.2),
+                  0 0 75px rgba(255, 0, 0, 0.2),
+                  0 0 80px rgba(255, 255, 0, 0.2),
+                  0 0 85px rgba(255, 0, 0, 0.2),
+                  0 0 90px rgba(147, 51, 234, 0.2),
+                  0 0 95px rgba(255, 255, 0, 0.2),
+                  0 0 100px rgba(255, 255, 0, 0.1),
+                  inset 0 0 20px rgba(255, 255, 0, 0.2)
+                `,
+                filter: 'blur(0.5px)',
+                transform: 'scale(1.02)'
+              } : {}}
+              onClick={() => setSelectedPlan('free')}
+            >
               <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-white mb-2">Basic</h3>
+                <div className="flex items-center justify-center mb-2">
+                  <h3 className="text-xl font-bold text-white">Basic</h3>
+                  {selectedPlan === 'free' && (
+                    <Check className="w-5 h-5 text-purple-500 ml-2" />
+                  )}
+                </div>
                 <div className="text-3xl font-bold text-white mb-2">FREE</div>
                 <div className="text-gray-400 text-sm">Forever</div>
               </div>
@@ -106,8 +154,18 @@ export default function UpgradePage() {
                 For developers, designers, and color lovers building simple apps or projects.
               </p>
               
-              <button className="w-full bg-gray-800 text-white py-2 rounded-lg font-semibold hover:bg-gray-700 transition-colors mb-6 text-sm">
-                Get started for free
+              <button 
+                className={`w-full py-2 rounded-lg font-semibold transition-colors mb-6 text-sm ${
+                  selectedPlan === 'free'
+                    ? 'bg-purple-600 text-white hover:bg-purple-700'
+                    : 'bg-gray-800 text-white hover:bg-gray-700'
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedPlan('free');
+                }}
+              >
+                {selectedPlan === 'free' ? 'Selected' : 'Get started for free'}
               </button>
               
               <div className="space-y-3">
@@ -121,7 +179,39 @@ export default function UpgradePage() {
             </div>
 
             {/* Pro Plan */}
-            <div className="bg-gray-900 rounded-xl shadow-lg p-6 border border-purple-500 relative">
+            <div 
+              className={`bg-gray-900 rounded-xl shadow-lg p-6 border-2 relative cursor-pointer transition-all ${
+                selectedPlan === 'pro' 
+                  ? 'border-purple-500' 
+                  : 'border-gray-800 hover:border-gray-600'
+              }`}
+              style={selectedPlan === 'pro' ? {
+                boxShadow: `
+                  0 0 15px rgba(255, 255, 0, 0.7),
+                  0 0 20px rgba(255, 0, 0, 0.6),
+                  0 0 25px rgba(255, 255, 0, 0.6),
+                  0 0 30px rgba(147, 51, 234, 0.5),
+                  0 0 35px rgba(255, 255, 0, 0.5),
+                  0 0 40px rgba(255, 255, 0, 0.4),
+                  0 0 45px rgba(255, 0, 0, 0.3),
+                  0 0 50px rgba(255, 255, 0, 0.3),
+                  0 0 55px rgba(255, 0, 0, 0.3),
+                  0 0 60px rgba(147, 51, 234, 0.3),
+                  0 0 65px rgba(255, 255, 0, 0.3),
+                  0 0 70px rgba(255, 255, 0, 0.2),
+                  0 0 75px rgba(255, 0, 0, 0.2),
+                  0 0 80px rgba(255, 255, 0, 0.2),
+                  0 0 85px rgba(255, 0, 0, 0.2),
+                  0 0 90px rgba(147, 51, 234, 0.2),
+                  0 0 95px rgba(255, 255, 0, 0.2),
+                  0 0 100px rgba(255, 255, 0, 0.1),
+                  inset 0 0 20px rgba(255, 255, 0, 0.2)
+                `,
+                filter: 'blur(0.5px)',
+                transform: 'scale(1.02)'
+              } : {}}
+              onClick={() => setSelectedPlan('pro')}
+            >
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
                   Most Popular
@@ -129,7 +219,12 @@ export default function UpgradePage() {
               </div>
               
               <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-white mb-2">Pro</h3>
+                <div className="flex items-center justify-center mb-2">
+                  <h3 className="text-xl font-bold text-white">Pro</h3>
+                  {selectedPlan === 'pro' && (
+                    <Check className="w-5 h-5 text-purple-500 ml-2" />
+                  )}
+                </div>
                 <div className="text-3xl font-bold text-white mb-2">
                   ${isYearly ? '3.33' : '5'}
                 </div>
@@ -140,8 +235,18 @@ export default function UpgradePage() {
                 For individuals who need more solutions and features to build and grow their projects.
               </p>
               
-              <button className="w-full bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors mb-6 text-sm">
-                Get PRO
+              <button 
+                className={`w-full py-2 rounded-lg font-semibold transition-colors mb-6 text-sm ${
+                  selectedPlan === 'pro'
+                    ? 'bg-purple-600 text-white hover:bg-purple-700'
+                    : 'bg-purple-600 text-white hover:bg-purple-700'
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedPlan('pro');
+                }}
+              >
+                {selectedPlan === 'pro' ? 'Selected' : 'Get PRO'}
               </button>
               
               <div className="space-y-3">
@@ -181,15 +286,29 @@ export default function UpgradePage() {
                     <th className="px-4 py-3 text-center text-xs font-semibold text-white">
                       <div>Free</div>
                       <div className="text-xs text-gray-400">Forever</div>
-                      <button className="mt-1 bg-gray-700 text-white px-3 py-1 rounded text-xs hover:bg-gray-600">
-                        Get started for free
+                      <button 
+                        className={`mt-1 px-3 py-1 rounded text-xs transition-colors ${
+                          selectedPlan === 'free'
+                            ? 'bg-purple-600 text-white hover:bg-purple-700'
+                            : 'bg-gray-700 text-white hover:bg-gray-600'
+                        }`}
+                        onClick={() => setSelectedPlan('free')}
+                      >
+                        {selectedPlan === 'free' ? 'Selected' : 'Get started for free'}
                       </button>
                     </th>
                     <th className="px-4 py-3 text-center text-xs font-semibold text-white">
                       <div>Pro</div>
                       <div className="text-xs text-gray-400">$5/month</div>
-                      <button className="mt-1 bg-purple-600 text-white px-3 py-1 rounded text-xs hover:bg-purple-700">
-                        Get PRO
+                      <button 
+                        className={`mt-1 px-3 py-1 rounded text-xs transition-colors ${
+                          selectedPlan === 'pro'
+                            ? 'bg-purple-600 text-white hover:bg-purple-700'
+                            : 'bg-gray-700 text-white hover:bg-gray-600'
+                        }`}
+                        onClick={() => setSelectedPlan('pro')}
+                      >
+                        {selectedPlan === 'pro' ? 'Selected' : 'Get PRO'}
                       </button>
                     </th>
                   </tr>
@@ -346,8 +465,26 @@ export default function UpgradePage() {
             </div>
           </div>
           
-          <button className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold text-base hover:bg-gray-100 transition-colors">
-            Upgrade to Pro for $3.33/mo
+          <button 
+            className={`px-6 py-3 rounded-lg font-semibold text-base transition-colors ${
+              selectedPlan === 'free'
+                ? 'bg-purple-600 text-white hover:bg-purple-700'
+                : 'bg-white text-purple-600 hover:bg-gray-100'
+            }`}
+            onClick={() => {
+              if (selectedPlan === 'free') {
+                // Handle free plan selection
+                console.log('Free plan selected');
+              } else {
+                // Handle pro plan selection
+                console.log('Pro plan selected');
+              }
+            }}
+          >
+            {selectedPlan === 'free' 
+              ? 'Continue with Free Plan' 
+              : `Upgrade to Pro for $${isYearly ? '3.33' : '5'}/mo`
+            }
           </button>
         </div>
       </section>
