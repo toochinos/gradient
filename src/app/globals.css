@@ -31,64 +31,81 @@ body {
   }
 }
 
-/* Landscape-only mode for mobile devices */
-@media (max-width: 768px) and (orientation: portrait) {
-  /* Hide all content in portrait mode */
-  body, html {
-    overflow: hidden !important;
-  }
-  
-  /* Hide main content in portrait */
-  .main-content, .gradient-container, nav {
-    display: none !important;
-  }
-  
-  /* Show landscape prompt */
-  .landscape-prompt {
-    display: flex !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    background: #111827 !important;
-    color: white !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    padding: 20px !important;
-    z-index: 9999 !important;
-  }
-  
-  .landscape-prompt h1 {
-    font-size: 2rem !important;
-    margin-bottom: 1rem !important;
-    color: #0DD162 !important;
-  }
-  
-  .landscape-prompt p {
-    font-size: 1.2rem !important;
-    margin-bottom: 2rem !important;
-    opacity: 0.8 !important;
-  }
-  
-  .landscape-icon {
-    font-size: 4rem !important;
-    margin-bottom: 1rem !important;
-    animation: rotate 2s linear infinite !important;
-  }
-  
-  @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(90deg); }
-  }
-}
-
-/* Hide landscape prompt in landscape mode */
+/* Mobile landscape optimized header */
 @media (max-width: 768px) and (orientation: landscape) {
-  .landscape-prompt {
-    display: none !important;
+  /* Ultra-compact header for perfect fit */
+  nav {
+    min-height: 32px !important;
+    max-height: 32px !important;
+    padding: 1px 4px !important;
+    background: rgba(31, 41, 55, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+  
+  /* Minimal logo size for mobile landscape */
+  nav .text-4xl {
+    font-size: 0.75rem !important;
+    line-height: 1 !important;
+    font-weight: 600 !important;
+    max-width: 80px !important;
+  }
+  
+  /* Ultra-compact logo container */
+  nav .flex.flex-col {
+    margin: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+  }
+  
+  /* Minimal header flex layout */
+  nav .flex {
+    gap: 2px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 30px !important;
+  }
+  
+  /* Minimal icon sizes */
+  nav .w-10.h-10 {
+    width: 20px !important;
+    height: 20px !important;
+    padding: 1px !important;
+  }
+  
+  nav .w-6.h-6 {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  
+  /* Ultra-compact buttons */
+  nav .space-x-4 > * {
+    font-size: 0.6rem !important;
+    padding: 1px 3px !important;
+    min-height: 18px !important;
+    min-width: 18px !important;
+  }
+  
+  /* Minimal button spacing */
+  nav .space-x-4 {
+    gap: 1px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Account creation button optimization */
+  nav .space-x-4 > button, nav .space-x-4 > a {
+    font-size: 0.55rem !important;
+    padding: 1px 4px !important;
+    min-height: 16px !important;
+    min-width: 16px !important;
+    white-space: nowrap !important;
+  }
+  
+  /* Adjust main content padding */
+  .main-content {
+    padding-top: 36px !important;
   }
 }
 
@@ -401,81 +418,6 @@ body {
   }
 }
 
-/* Additional mobile landscape specific styles */
-@media (max-width: 768px) and (orientation: landscape) {
-  /* Ultra-compact header for landscape mode */
-  nav {
-    min-height: 40px !important;
-    padding: 2px 6px !important;
-  }
-  
-  /* Reduced logo size for mobile landscape */
-  nav .text-4xl {
-    font-size: 0.875rem !important;
-    line-height: 1 !important;
-    font-weight: 600 !important;
-  }
-  
-  /* Make logo container more compact */
-  nav .flex.flex-col {
-    margin: 0 !important;
-    padding: 0 !important;
-    flex-shrink: 1 !important;
-    min-width: 0 !important;
-  }
-  
-  /* Optimize header flex layout for perfect fit */
-  nav .flex {
-    gap: 4px !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-  
-  /* Ensure logo text doesn't overflow */
-  nav .text-4xl {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 120px !important;
-  }
-  
-  nav .w-10.h-10 {
-    width: 24px !important;
-    height: 24px !important;
-  }
-  
-  nav .w-6.h-6 {
-    width: 14px !important;
-    height: 14px !important;
-  }
-  
-  nav .space-x-4 > * {
-    font-size: 0.7rem !important;
-    padding: 1px 4px !important;
-    min-height: 24px !important;
-    min-width: 24px !important;
-  }
-  
-  /* Optimize right side buttons spacing */
-  nav .space-x-4 {
-    gap: 2px !important;
-    flex-shrink: 0 !important;
-  }
-  
-  /* Ensure account creation button is visible */
-  nav .space-x-4 > button, nav .space-x-4 > a {
-    font-size: 0.65rem !important;
-    padding: 2px 6px !important;
-    min-height: 22px !important;
-    min-width: 22px !important;
-    white-space: nowrap !important;
-  }
-  
-  .main-content {
-    padding-top: 44px !important;
-  }
   
   /* Optimize touch interactions for gradient balls in landscape */
   .gradient-ball {
