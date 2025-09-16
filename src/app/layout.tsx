@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Gradient Master",
   description: "Create beautiful mesh gradients with interactive controls - The ultimate gradient design tool",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+  viewport: "width=1200, initial-scale=0.5, maximum-scale=1, user-scalable=yes",
 };
 
 export default function RootLayout({

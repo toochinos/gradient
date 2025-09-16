@@ -20,11 +20,12 @@ body {
   user-select: none;
 }
 
-/* Mobile optimizations */
+/* Desktop view for mobile devices */
 @media (max-width: 768px) {
   body {
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
+    min-width: 1200px; /* Force desktop width */
   }
   
   /* Prevent zoom on input focus */
@@ -32,21 +33,32 @@ body {
     font-size: 16px !important;
   }
   
-  /* Improve touch targets */
+  /* Improve touch targets for desktop view */
   button, a, [role="button"] {
-    min-height: 44px;
-    min-width: 44px;
+    min-height: 32px;
+    min-width: 32px;
   }
   
-  /* Ensure gradient display is visible on mobile */
+  /* Ensure gradient display maintains desktop layout */
   .gradient-display {
-    min-height: 50vh !important;
+    min-height: 60vh !important;
     height: 100% !important;
   }
   
-  /* Fix mobile layout issues */
+  /* Fix layout for desktop view on mobile */
   .flex.flex-col {
-    height: calc(100vh - 80px) !important;
+    height: calc(100vh - 60px) !important;
+  }
+  
+  /* Force desktop-like spacing and sizing */
+  .container {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+  }
+  
+  /* Ensure controls panel maintains desktop layout */
+  .controls-panel {
+    min-width: 300px !important;
   }
   
   /* Ensure gradient preview area is visible */
