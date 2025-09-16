@@ -322,10 +322,14 @@ const GradientGenerator = forwardRef<GradientGeneratorRef, GradientGeneratorProp
     setTimeout(() => setSelectedCircle(null), 1000);
   }, []);
 
-  // Touch event handlers for gradient circles
+  // Optimized touch event handlers for gradient circles
   const handleTouchStart = useCallback((e: React.TouchEvent, pointId: string) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Only handle single touch
+    if (e.touches.length !== 1) return;
+    
     setSelectedCircle(pointId);
     setIsDragging(pointId);
     if (onPointSelect) {
@@ -334,20 +338,24 @@ const GradientGenerator = forwardRef<GradientGeneratorRef, GradientGeneratorProp
   }, [onPointSelect]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isDragging || !containerRef.current) return;
+    if (!isDragging || !containerRef.current || e.touches.length !== 1) return;
     
     e.preventDefault();
     e.stopPropagation();
     
     const rect = containerRef.current.getBoundingClientRect();
     const touch = e.touches[0];
-    const x = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
-    const y = Math.max(0, Math.min(100, ((touch.clientY - rect.top) / rect.height) * 100));
+    
+    // Use requestAnimationFrame for smoother updates
+    requestAnimationFrame(() => {
+      const x = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
+      const y = Math.max(0, Math.min(100, ((touch.clientY - rect.top) / rect.height) * 100));
 
-    const newPoints = meshPoints.map(point => 
-      point.id === isDragging ? { ...point, x, y } : point
-    );
-    updateMeshPoints(newPoints);
+      const newPoints = meshPoints.map(point => 
+        point.id === isDragging ? { ...point, x, y } : point
+      );
+      updateMeshPoints(newPoints);
+    });
   }, [isDragging, meshPoints, updateMeshPoints]);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
@@ -631,8 +639,11 @@ const GradientGenerator = forwardRef<GradientGeneratorRef, GradientGeneratorProp
     }
   }, [isDraggingImage, isResizingImage, isRotatingImage, handleImageMouseUp, isDrawingMode, handleDrawingMouseUp, handleMouseUp]);
 
-  // Combined touch handlers
+  // Optimized combined touch handlers
   const handleCombinedTouchStart = useCallback((e: React.TouchEvent) => {
+    // Only handle single touch for better performance
+    if (e.touches.length !== 1) return;
+    
     if (isDrawingMode) {
       handleDrawingTouchStart(e);
     }
@@ -640,6 +651,9 @@ const GradientGenerator = forwardRef<GradientGeneratorRef, GradientGeneratorProp
   }, [isDrawingMode, handleDrawingTouchStart]);
 
   const handleCombinedTouchMove = useCallback((e: React.TouchEvent) => {
+    // Only handle single touch for better performance
+    if (e.touches.length !== 1) return;
+    
     if (isDrawingMode) {
       handleDrawingTouchMove(e);
     } else if (isDragging) {
@@ -1344,7 +1358,7 @@ ${layerElements}
     <div className="w-full h-full">
       <div 
         ref={containerRef}
-        className={`gradient-display relative w-full h-full overflow-hidden select-none ${
+        className={`gradient-container gradient-display relative w-full h-full overflow-hidden select-none ${
           hideControls ? 'cursor-default' : 
           isDrawingMode ? 'cursor-crosshair' : 
           'cursor-crosshair'
@@ -1609,7 +1623,7 @@ ${layerElements}
             
             {/* Main gradient circle */}
             <div
-              className="w-8 h-8 sm:w-6 sm:h-6 border-2 border-white rounded-full cursor-move shadow-lg hover:scale-110 active:scale-125 transition-transform touch-manipulation"
+              className="gradient-ball w-8 h-8 sm:w-6 sm:h-6 border-2 border-white rounded-full cursor-move shadow-lg hover:scale-110 active:scale-125 transition-transform touch-manipulation"
               style={{
                 backgroundColor: point.color,
                 zIndex: 50, // Below images but above gradient layers

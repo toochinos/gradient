@@ -1476,6 +1476,36 @@ export default function Home() {
     setIsHydrated(true);
   }, []);
 
+  // Orientation detection for mobile landscape-only mode
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      // Force landscape orientation on mobile devices
+      if (window.innerWidth <= 768) {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        
+        if (!isLandscape) {
+          // Show landscape prompt
+          document.body.style.overflow = 'hidden';
+        } else {
+          // Hide landscape prompt and show content
+          document.body.style.overflow = 'auto';
+        }
+      }
+    };
+
+    // Initial check
+    handleOrientationChange();
+
+    // Listen for orientation changes
+    window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener('resize', handleOrientationChange);
+
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('resize', handleOrientationChange);
+    };
+  }, []);
+
   // Master control handlers
   const handleToggleAllColors = () => {
     setHideAllColors(prev => !prev);
@@ -2211,6 +2241,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
+      {/* Landscape-only prompt for mobile devices */}
+      <div className="landscape-prompt">
+        <div className="landscape-icon">📱</div>
+        <h1>Gradient Master</h1>
+        <p>Please rotate your device to landscape mode for the best experience</p>
+        <p className="text-sm opacity-60">This app is optimized for landscape viewing on mobile devices</p>
+      </div>
       {/* CSS Keyframes for Gradient Master Text Animation */}
       <style jsx>{`
         @keyframes layer1-animate {

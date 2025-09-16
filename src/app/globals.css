@@ -31,8 +31,69 @@ body {
   }
 }
 
-/* Mobile portrait desktop view emulation */
+/* Landscape-only mode for mobile devices */
 @media (max-width: 768px) and (orientation: portrait) {
+  /* Hide all content in portrait mode */
+  body, html {
+    overflow: hidden !important;
+  }
+  
+  /* Hide main content in portrait */
+  .main-content, .gradient-container, nav {
+    display: none !important;
+  }
+  
+  /* Show landscape prompt */
+  .landscape-prompt {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: #111827 !important;
+    color: white !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 20px !important;
+    z-index: 9999 !important;
+  }
+  
+  .landscape-prompt h1 {
+    font-size: 2rem !important;
+    margin-bottom: 1rem !important;
+    color: #0DD162 !important;
+  }
+  
+  .landscape-prompt p {
+    font-size: 1.2rem !important;
+    margin-bottom: 2rem !important;
+    opacity: 0.8 !important;
+  }
+  
+  .landscape-icon {
+    font-size: 4rem !important;
+    margin-bottom: 1rem !important;
+    animation: rotate 2s linear infinite !important;
+  }
+  
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(90deg); }
+  }
+}
+
+/* Hide landscape prompt in landscape mode */
+@media (max-width: 768px) and (orientation: landscape) {
+  .landscape-prompt {
+    display: none !important;
+  }
+}
+
+/* Mobile portrait desktop view emulation - DISABLED */
+@media (max-width: 768px) and (orientation: portrait) and (false) {
   /* Force desktop layout in portrait mode */
   html, body {
     min-width: 1920px !important;
@@ -193,6 +254,33 @@ body {
     display: flex !important;
   }
   
+  /* Optimize touch interactions for gradient balls */
+  .gradient-ball {
+    touch-action: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    cursor: grab !important;
+  }
+  
+  .gradient-ball:active {
+    cursor: grabbing !important;
+    transform: scale(1.1) !important;
+  }
+  
+  /* Smooth transitions for touch interactions */
+  .gradient-ball, .gradient-display {
+    transition: transform 0.1s ease-out !important;
+    will-change: transform !important;
+  }
+  
+  /* Prevent scrolling during ball dragging */
+  .gradient-container {
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+  }
+  
   /* Prevent mobile-specific behaviors */
   * {
     -webkit-tap-highlight-color: transparent !important;
@@ -321,8 +409,36 @@ body {
     padding: 2px 6px !important;
   }
   
+  /* Reduced logo size for mobile landscape */
   nav .text-4xl {
-    font-size: 1rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1 !important;
+    font-weight: 600 !important;
+  }
+  
+  /* Make logo container more compact */
+  nav .flex.flex-col {
+    margin: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+  }
+  
+  /* Optimize header flex layout for perfect fit */
+  nav .flex {
+    gap: 4px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  
+  /* Ensure logo text doesn't overflow */
+  nav .text-4xl {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 120px !important;
   }
   
   nav .w-10.h-10 {
@@ -342,8 +458,50 @@ body {
     min-width: 24px !important;
   }
   
+  /* Optimize right side buttons spacing */
+  nav .space-x-4 {
+    gap: 2px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Ensure account creation button is visible */
+  nav .space-x-4 > button, nav .space-x-4 > a {
+    font-size: 0.65rem !important;
+    padding: 2px 6px !important;
+    min-height: 22px !important;
+    min-width: 22px !important;
+    white-space: nowrap !important;
+  }
+  
   .main-content {
     padding-top: 44px !important;
+  }
+  
+  /* Optimize touch interactions for gradient balls in landscape */
+  .gradient-ball {
+    touch-action: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    cursor: grab !important;
+  }
+  
+  .gradient-ball:active {
+    cursor: grabbing !important;
+    transform: scale(1.1) !important;
+  }
+  
+  /* Smooth transitions for touch interactions in landscape */
+  .gradient-ball, .gradient-display {
+    transition: transform 0.1s ease-out !important;
+    will-change: transform !important;
+  }
+  
+  /* Prevent scrolling during ball dragging in landscape */
+  .gradient-container {
+    touch-action: none !important;
+    overscroll-behavior: none !important;
   }
   
   /* Adjust body content for mobile landscape */
