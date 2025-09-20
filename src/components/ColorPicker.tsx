@@ -152,7 +152,7 @@ export default function ColorPicker({ color, onChange, onApply }: ColorPickerPro
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [hsl]);
+  }, [hsl, updateColor]);
 
   return (
     <div className="bg-gray-800 p-4 rounded-lg shadow-lg w-64">

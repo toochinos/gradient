@@ -18,6 +18,8 @@ import ColorPicker from '@/components/ColorPicker';
 import SketchColorPicker from '@/components/SketchColorPicker';
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { Camera, ImageUp, RemoveFormatting, Bot, Sparkles, Pipette, PaintRoller, FireExtinguisher, CircleDashed, Shapes, Copy } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import GIF from 'gif.js';
 import html2canvas from 'html2canvas';
 
@@ -51,6 +53,13 @@ const starTypes = [
 
 export default function Home() {
   const gradientRef = useRef<GradientGeneratorRef>(null);
+  const router = useRouter();
+  
+  // Fast navigation handler
+  const handleUpgradeClick = useCallback(() => {
+    router.push('/upgrade');
+  }, [router]);
+  
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [generatedCSS, setGeneratedCSS] = useState('');
@@ -86,6 +95,7 @@ export default function Home() {
   const [backgroundColorPickerOpen, setBackgroundColorPickerOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fullscreenKey, setFullscreenKey] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [gradientType, setGradientType] = useState<'linear' | 'radial' | 'circular' | 'effects' | 'nothing'>('nothing');
   const [enabledGradientTypes, setEnabledGradientTypes] = useState<{
     linear: boolean;
@@ -219,7 +229,7 @@ export default function Home() {
     }
     
     return keyframes;
-  }, [isAnimating, baseMeshPointsHash]);
+  }, [isAnimating, meshPoints]);
   const [currentKeyframe, setCurrentKeyframe] = useState(0);
   const [animationStartTime, setAnimationStartTime] = useState<number | null>(null);
   const keyframesGeneratedRef = useRef(false);
@@ -257,7 +267,7 @@ export default function Home() {
       setHistory([initialState]);
       setHistoryIndex(0);
     }
-  }, []);
+  }, [meshPoints, gradientType, gradientAngle, backgroundColor, history.length]);
 
   // Ensure client-side only operations
   useEffect(() => {
@@ -1483,6 +1493,7 @@ export default function Home() {
     setIsHydrated(true);
   }, []);
 
+
   // Master control handlers
   const handleToggleAllColors = () => {
     setHideAllColors(prev => !prev);
@@ -2055,7 +2066,7 @@ export default function Home() {
       }));
       setMeshPoints(pointsWithNames);
     }
-  }, [gradientType, gradientAngle, backgroundColor, historyIndex]);
+  }, [meshPoints, gradientType, gradientAngle, backgroundColor, historyIndex]);
 
   const handlePointSelect = useCallback((pointId: string) => {
     setSelectedColorId(pointId);
@@ -2299,8 +2310,18 @@ export default function Home() {
       )}
 
       {/* Top Navigation Bar */}
-      <nav className="bg-gray-800 px-6 py-4">
+      <nav className="bg-gray-800 px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden text-white p-2 rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          
           {/* Logo Section */}
           <div className="flex items-center space-x-4">
             {/* Gradient Master Logo */}
@@ -2361,9 +2382,9 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-8">
-            {/* Navigation Links */}
-            <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-4 sm:space-x-8">
+            {/* Navigation Links - Hidden on mobile */}
+            <div className="hidden md:flex items-center space-x-6">
               <a href="#" className="text-gray-300 hover:text-white transition-colors text-lg">Discover</a>
               <a href="#" className="text-gray-300 hover:text-white transition-colors text-lg">Palettes</a>
               <a href="#" className="text-gray-300 hover:text-white transition-colors text-lg">Gradients</a>
@@ -2458,7 +2479,7 @@ export default function Home() {
           
           {/* Right side buttons */}
           <div className="flex items-center space-x-4">
-            <Link href="/upgrade" className="text-gray-300 hover:text-white transition-colors">Upgrade</Link>
+            <Link href="/upgrade" className="text-gray-300 hover:text-white transition-colors" prefetch={true}>Upgrade</Link>
             <button className="text-gray-300 hover:text-white transition-colors">Sign in</button>
             <button 
               className="text-gray-600 px-4 py-2 rounded-lg transition-colors relative overflow-hidden font-bold"
@@ -2474,10 +2495,80 @@ export default function Home() {
         </div>
       </nav>
 
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={() => setIsMobileMenuOpen(false)}>
+          <div className="fixed left-0 top-0 h-full w-80 bg-gray-800 border-r border-gray-700 p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-semibold text-white">Controls</h2>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="space-y-6">
+              {/* Mobile Control Panel Content - Same as desktop */}
+              <div>
+                <div className="inline-block bg-purple-100 text-purple-800 text-xs font-medium px-2 py-1 rounded mb-3">
+                  FEATURED
+                </div>
+                <h1 className="text-xl font-semibold text-white">Mesh Gradient Generator</h1>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-2">
+                <button 
+                  onClick={handleGenerate}
+                  disabled={isAnimating}
+                  className="flex items-center justify-center space-x-1 bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Generate</span>
+                </button>
+                <button
+                  onClick={handleCodeButtonClick}
+                  className="flex items-center justify-center space-x-1 bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors text-sm"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                  <span>Code</span>
+                </button>
+                <button
+                  onClick={handleExportButtonClick}
+                  className="flex items-center justify-center space-x-1 bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors text-sm"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>Export</span>
+                </button>
+                <button 
+                  onClick={handleShufflePositions}
+                  disabled={isAnimating}
+                  className="flex items-center justify-center space-x-1 bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Shuffle</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content Area */}
-      <div className="flex h-[calc(100vh-73px)]">
-        {/* Left Control Panel */}
-        <div className="w-80 bg-gray-800 border-r border-gray-700 p-6 overflow-y-auto overflow-x-visible">
+      <div className="flex flex-col md:flex-row h-[calc(100vh-80px)] md:h-[calc(100vh-73px)] min-h-0">
+        {/* Left Control Panel - Hidden on mobile */}
+        <div className="hidden md:block w-80 bg-gray-800 border-r border-gray-700 p-6 overflow-y-auto overflow-x-visible">
           <div className="space-y-6">
             {/* Featured Tag and Title */}
             <div>
@@ -3102,7 +3193,7 @@ export default function Home() {
 
         {/* Center Gradient Preview Area */}
         <div 
-          className="flex-1 overflow-hidden relative -mt-4" 
+          className="flex-1 w-full h-full md:h-full overflow-hidden relative -mt-4 md:mt-0 min-h-0 gradient-preview-area" 
           style={{ backgroundColor: backgroundColor }}
           onClick={handleGradientClick}
         >

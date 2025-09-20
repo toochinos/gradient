@@ -14,6 +14,524 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Force desktop view for mobile devices */
+@media (max-width: 768px) {
+  html, body {
+    -webkit-text-size-adjust: none !important;
+    -ms-text-size-adjust: none !important;
+    min-width: 1920px !important; /* Force desktop width */
+    width: 1920px !important;
+    overflow-x: auto !important;
+  }
+}
+
+/* Mobile landscape optimized header */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Ultra-compact header for perfect fit */
+  nav {
+    min-height: 32px !important;
+    max-height: 32px !important;
+    padding: 1px 4px !important;
+    background: rgba(31, 41, 55, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+  
+  /* Minimal logo size for mobile landscape */
+  nav .text-4xl {
+    font-size: 0.75rem !important;
+    line-height: 1 !important;
+    font-weight: 600 !important;
+    max-width: 80px !important;
+  }
+  
+  /* Ultra-compact logo container */
+  nav .flex.flex-col {
+    margin: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+  }
+  
+  /* Minimal header flex layout */
+  nav .flex {
+    gap: 2px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 30px !important;
+  }
+  
+  /* Minimal icon sizes */
+  nav .w-10.h-10 {
+    width: 20px !important;
+    height: 20px !important;
+    padding: 1px !important;
+  }
+  
+  nav .w-6.h-6 {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  
+  /* Ultra-compact buttons */
+  nav .space-x-4 > * {
+    font-size: 0.6rem !important;
+    padding: 1px 3px !important;
+    min-height: 18px !important;
+    min-width: 18px !important;
+  }
+  
+  /* Minimal button spacing */
+  nav .space-x-4 {
+    gap: 1px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Account creation button optimization */
+  nav .space-x-4 > button, nav .space-x-4 > a {
+    font-size: 0.55rem !important;
+    padding: 1px 4px !important;
+    min-height: 16px !important;
+    min-width: 16px !important;
+    white-space: nowrap !important;
+  }
+  
+  /* Adjust main content padding */
+  .main-content {
+    padding-top: 36px !important;
+  }
+}
+
+/* Mobile portrait desktop view emulation - DISABLED */
+@media (max-width: 768px) and (orientation: portrait) and (false) {
+  /* Force desktop layout in portrait mode */
+  html, body {
+    min-width: 1920px !important;
+    width: 1920px !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Desktop-style header for portrait */
+  nav {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    padding: 8px 12px !important;
+    background: rgba(31, 41, 55, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    height: auto !important;
+    min-height: 60px !important;
+  }
+  
+  /* Desktop header layout for portrait */
+  nav .flex {
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+  
+  /* Desktop logo size for portrait */
+  nav .text-4xl {
+    font-size: 1.5rem !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+  
+  /* Desktop icon sizes for portrait */
+  nav .w-10.h-10 {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 4px !important;
+  }
+  
+  nav .w-6.h-6 {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  /* Desktop button sizes for portrait */
+  nav .space-x-4 > * {
+    font-size: 0.875rem !important;
+    padding: 6px 12px !important;
+    min-height: 36px !important;
+    min-width: 36px !important;
+  }
+  
+  /* Main content with desktop spacing */
+  .main-content {
+    min-width: 1920px !important;
+    padding-top: 76px !important;
+    height: calc(100vh - 76px) !important;
+    max-height: calc(100vh - 76px) !important;
+  }
+  
+  /* Desktop-style body content */
+  body {
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+  
+  /* Desktop layout for all containers */
+  .container, .main-container {
+    height: calc(100vh - 76px) !important;
+    max-height: calc(100vh - 76px) !important;
+    overflow: hidden !important;
+  }
+  
+  /* Desktop-style tools panel */
+  .tools-panel, .controls-panel {
+    height: calc(100vh - 76px) !important;
+    max-height: calc(100vh - 76px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 12px !important;
+  }
+  
+  /* Desktop-style gradient display */
+  .gradient-display, .gradient-preview-area {
+    height: calc(100vh - 76px) !important;
+    max-height: calc(100vh - 76px) !important;
+    min-height: calc(100vh - 76px) !important;
+    overflow: hidden !important;
+  }
+  
+  /* Desktop-style flex containers */
+  .flex.flex-col, .flex.flex-row {
+    height: calc(100vh - 76px) !important;
+    max-height: calc(100vh - 76px) !important;
+  }
+  
+  /* Desktop-style form elements */
+  input, select, textarea {
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+  }
+  
+  /* Desktop-style buttons */
+  button, a, [role="button"] {
+    min-height: 36px !important;
+    min-width: 36px !important;
+    padding: 8px 16px !important;
+  }
+  
+  /* Desktop-style spacing and layout */
+  .gradient-generator-container {
+    height: calc(100vh - 76px) !important;
+    max-height: calc(100vh - 76px) !important;
+  }
+  
+  /* Desktop-style canvas and SVG */
+  canvas, svg {
+    max-height: calc(100vh - 76px) !important;
+    height: auto !important;
+  }
+  
+  /* Desktop-style sidebars */
+  .sidebar, .control-sidebar {
+    height: calc(100vh - 76px) !important;
+    max-height: calc(100vh - 76px) !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Desktop-style toolbars */
+  .toolbar, .button-group {
+    padding: 8px !important;
+    gap: 8px !important;
+  }
+  
+  /* Desktop-style form groups */
+  .form-group, .input-group {
+    margin-bottom: 12px !important;
+  }
+  
+  /* Ensure desktop layout is maintained */
+  .desktop-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    height: calc(100vh - 76px) !important;
+  }
+  
+  /* Desktop-style navigation links */
+  nav .hidden.md\\:flex {
+    display: flex !important;
+  }
+  
+  /* Optimize touch interactions for gradient balls */
+  .gradient-ball {
+    touch-action: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    cursor: grab !important;
+  }
+  
+  .gradient-ball:active {
+    cursor: grabbing !important;
+    transform: scale(1.1) !important;
+  }
+  
+  /* Smooth transitions for touch interactions */
+  .gradient-ball, .gradient-display {
+    transition: transform 0.1s ease-out !important;
+    will-change: transform !important;
+  }
+  
+  /* Prevent scrolling during ball dragging */
+  .gradient-container {
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+  }
+  
+  /* Prevent mobile-specific behaviors */
+  * {
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+  }
+  
+  /* Prevent zoom on input focus */
+  input, textarea, select {
+    font-size: 14px !important;
+  }
+  
+  /* Desktop-like touch targets */
+  button, a, [role="button"] {
+    min-height: 28px !important;
+    min-width: 28px !important;
+  }
+  
+  /* Force desktop layout */
+  .gradient-display {
+    min-height: 70vh !important;
+    height: 100% !important;
+  }
+  
+  /* Desktop layout constraints */
+  .flex.flex-col {
+    height: calc(100vh - 40px) !important;
+  }
+  
+  /* Force desktop container */
+  .container {
+    max-width: 1920px !important;
+    margin: 0 auto !important;
+    padding: 0 20px !important;
+  }
+  
+  /* Desktop controls panel */
+  .controls-panel {
+    min-width: 400px !important;
+  }
+  
+  /* Prevent mobile viewport adjustments */
+  .main-content {
+    min-width: 1920px !important;
+  }
+  
+  /* Responsive header for mobile landscape */
+  nav {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 1000 !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    padding: 4px 8px !important;
+    background: rgba(31, 41, 55, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    height: auto !important;
+    min-height: 48px !important;
+  }
+  
+  /* Responsive header layout */
+  nav .flex {
+    flex-wrap: nowrap !important;
+    gap: 4px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+  
+  /* Make logo smaller and more compact */
+  nav .flex.flex-col {
+    margin: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+  }
+  
+  nav .text-4xl {
+    font-size: 1.25rem !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+  }
+  
+  /* Hide navigation links on mobile to save space */
+  nav .hidden.md\\:flex {
+    display: none !important;
+  }
+  
+  /* Make center icons smaller and more compact */
+  nav .w-10.h-10 {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 2px !important;
+  }
+  
+  nav .w-6.h-6 {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  /* Adjust right side buttons to be more compact */
+  nav .space-x-4 {
+    gap: 2px !important;
+  }
+  
+  nav .space-x-4 > * {
+    font-size: 0.75rem !important;
+    padding: 2px 6px !important;
+    min-height: 28px !important;
+    min-width: 28px !important;
+  }
+  
+  /* Add top padding to main content to account for fixed header */
+  .main-content {
+    min-width: 1920px !important;
+    padding-top: 56px !important;
+  }
+
+  
+  /* Optimize touch interactions for gradient balls in landscape */
+  .gradient-ball {
+    touch-action: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    cursor: grab !important;
+  }
+  
+  .gradient-ball:active {
+    cursor: grabbing !important;
+    transform: scale(1.1) !important;
+  }
+  
+  /* Smooth transitions for touch interactions in landscape */
+  .gradient-ball, .gradient-display {
+    transition: transform 0.1s ease-out !important;
+    will-change: transform !important;
+  }
+  
+  /* Prevent scrolling during ball dragging in landscape */
+  .gradient-container {
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+  }
+  
+  /* Adjust body content for mobile landscape */
+  body {
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+  
+  /* Main content area adjustments */
+  .main-content {
+    height: calc(100vh - 44px) !important;
+    min-height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+    overflow: hidden !important;
+  }
+  
+  /* Tools panel adjustments for mobile landscape */
+  .tools-panel, .controls-panel {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 8px !important;
+  }
+  
+  /* Gradient display area adjustments */
+  .gradient-display, .gradient-preview-area {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+    min-height: calc(100vh - 44px) !important;
+    overflow: hidden !important;
+  }
+  
+  /* Flex container adjustments */
+  .flex.flex-col, .flex.flex-row {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+  }
+  
+  /* Ensure no content overflows */
+  .container, .main-container {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+    overflow: hidden !important;
+  }
+  
+  /* Specific adjustments for gradient generator components */
+  .gradient-generator-container {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+  }
+  
+  /* Canvas and SVG elements */
+  canvas, svg {
+    max-height: calc(100vh - 44px) !important;
+    height: auto !important;
+  }
+  
+  /* Sidebar and control panels */
+  .sidebar, .control-sidebar {
+    height: calc(100vh - 44px) !important;
+    max-height: calc(100vh - 44px) !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Button groups and toolbars */
+  .toolbar, .button-group {
+    padding: 4px !important;
+    gap: 2px !important;
+  }
+  
+  /* Form elements and inputs */
+  .form-group, .input-group {
+    margin-bottom: 8px !important;
+  }
+  
+  input, select, textarea {
+    padding: 4px 6px !important;
+    font-size: 12px !important;
+  }
+  
+  /* Ensure gradient preview area is visible */
+  .gradient-preview-area {
+    min-height: 60vh !important;
+    height: 100% !important;
+    flex: 1 1 auto !important;
+  }
 }
 
 /* Custom slider styles */
