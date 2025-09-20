@@ -7,7 +7,7 @@ interface RibbonFieldProps {
   isFullscreen: boolean;
 }
 
-interface Point {
+interface PointInstance {
   x: number;
   y: number;
   a: number;
@@ -15,13 +15,14 @@ interface Point {
   dy: number;
   hue: number;
   color: string;
-  neighbor?: Point;
+  neighbor?: PointInstance;
+  update(): void;
 }
 
 export default function RibbonField({ isVisible, isFullscreen }: RibbonFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
-  const pointsRef = useRef<Point[]>([]);
+  const pointsRef = useRef<PointInstance[]>([]);
   const tickSpeedRef = useRef(10);
   const baseRef = useRef(180);
   const numPointsRef = useRef(isFullscreen ? 15 : 10);
@@ -129,7 +130,7 @@ export default function RibbonField({ isVisible, isFullscreen }: RibbonFieldProp
 
       for (let n = 0; n < tickSpeedRef.current; n++) {
         for (let i = 0; i < pointsRef.current.length; i++) {
-          (pointsRef.current[i] as any).update();
+          pointsRef.current[i].update();
         }
         ticksRef.current++;
       }

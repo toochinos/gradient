@@ -11,11 +11,11 @@ interface StarFieldProps {
 
 const StarField: React.FC<StarFieldProps> = ({ isVisible, className = '', isFullscreen = false }) => {
   const mountRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<THREE.Scene>();
-  const rendererRef = useRef<THREE.WebGLRenderer>();
-  const cameraRef = useRef<THREE.PerspectiveCamera>();
-  const starsRef = useRef<THREE.Points>();
-  const animationIdRef = useRef<number>();
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const starsRef = useRef<THREE.Points | null>(null);
+  const animationIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!mountRef.current || !isVisible) return;
