@@ -1,8 +1,17 @@
 'use client';
 
+import Link from 'next/link';
 import GradientGenerator, { GradientGeneratorRef, MeshPoint } from '@/components/GradientGenerator';
 import CookieBanner from '@/components/CookieBanner';
 import CodeModal from '@/components/CodeModal';
+import GradientExporter from '@/components/GradientExporter';
+import StarField from '@/components/StarField';
+import BlobField from '@/components/BlobField';
+import BlackHoleField from '@/components/BlackHoleField';
+import SwarmField from '@/components/SwarmField';
+import RibbonField from '@/components/RibbonField';
+import SplashField from '@/components/SplashField';
+import CreaturesField from '@/components/CreaturesField';
 import MuiBlurSlider from '@/components/MuiBlurSlider';
 import MuiAngleSlider from '@/components/MuiAngleSlider';
 import ColorPicker from '@/components/ColorPicker';
@@ -43,6 +52,7 @@ const starTypes = [
 export default function Home() {
   const gradientRef = useRef<GradientGeneratorRef>(null);
   const [isCodeModalOpen, setIsCodeModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [generatedCSS, setGeneratedCSS] = useState('');
   const [selectedColorId, setSelectedColorId] = useState<string | null>(null);
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
@@ -76,16 +86,25 @@ export default function Home() {
   const [backgroundColorPickerOpen, setBackgroundColorPickerOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fullscreenKey, setFullscreenKey] = useState(0);
-  const [gradientType, setGradientType] = useState<'linear' | 'radial' | 'circular' | 'nothing'>('nothing');
+  const [gradientType, setGradientType] = useState<'linear' | 'radial' | 'circular' | 'effects' | 'nothing'>('nothing');
   const [enabledGradientTypes, setEnabledGradientTypes] = useState<{
     linear: boolean;
     radial: boolean;
     circular: boolean;
+    effects: boolean;
   }>({
     linear: false,
     radial: false,
-    circular: false
+    circular: false,
+    effects: false
   });
+  const [isEffectsEnabled, setIsEffectsEnabled] = useState(false);
+  const [isBlobEnabled, setIsBlobEnabled] = useState(false);
+  const [isBlackHoleEnabled, setIsBlackHoleEnabled] = useState(false);
+  const [isSwarmEnabled, setIsSwarmEnabled] = useState(false);
+  const [isRibbonEnabled, setIsRibbonEnabled] = useState(false);
+  const [isSplashEnabled, setIsSplashEnabled] = useState(false);
+  const [isCreaturesEnabled, setIsCreaturesEnabled] = useState(false);
   const [gradientAngle, setGradientAngle] = useState(0);
   const [meshPoints, setMeshPoints] = useState<MeshPoint[]>([
     { id: '1', x: 30, y: 40, color: '#0DD162', name: 'Bright Green', blur: 100, hideColor: false, hideBalls: false, textureType: 'circular' },
@@ -315,14 +334,28 @@ export default function Home() {
   const handleCodeButtonClick = () => {
     if (gradientRef.current) {
       let css = gradientRef.current.generateCSS();
-      
+
       // Add animation CSS if animation is active
       if (isAnimating && keyframesLengthRef.current > 0) {
         css += generateAnimationCSS();
       }
-      
+
       setGeneratedCSS(css);
       setIsCodeModalOpen(true);
+    }
+  };
+
+  const handleExportButtonClick = () => {
+    if (gradientRef.current) {
+      let css = gradientRef.current.generateCSS();
+
+      // Add animation CSS if animation is active
+      if (isAnimating && keyframesLengthRef.current > 0) {
+        css += generateAnimationCSS();
+      }
+
+      setGeneratedCSS(css);
+      setIsExportModalOpen(true);
     }
   };
 
@@ -1800,7 +1833,7 @@ export default function Home() {
     setGradientType(e.target.value as 'linear' | 'radial' | 'circular' | 'nothing');
   };
 
-  const handleGradientTypeToggle = (type: 'linear' | 'radial' | 'circular') => {
+  const handleGradientTypeToggle = (type: 'linear' | 'radial' | 'circular' | 'effects') => {
     saveToHistory(); // Save current state before making changes
 
     // Special handling for each gradient type - set all colors to corresponding texture type
@@ -1819,6 +1852,11 @@ export default function Home() {
         ...point,
         textureType: 'radial' as const
       })));
+    } else if (type === 'effects') {
+      setMeshPoints(prev => prev.map(point => ({
+        ...point,
+        textureType: 'circular' as const
+      })));
     }
 
     setEnabledGradientTypes(prev => ({
@@ -1832,13 +1870,54 @@ export default function Home() {
       [type]: !enabledGradientTypes[type]
     };
 
-    if (!newEnabledTypes.linear && !newEnabledTypes.radial && !newEnabledTypes.circular) {
+    if (!newEnabledTypes.linear && !newEnabledTypes.radial && !newEnabledTypes.circular && !newEnabledTypes.effects) {
       setGradientType('nothing');
     } else {
       // If any gradient types are enabled, set to 'nothing' to allow individual rendering
       setGradientType('nothing');
     }
   };
+
+  const handleEffectsToggle = () => {
+    saveToHistory(); // Save current state before making changes
+    setIsEffectsEnabled(prev => !prev);
+  };
+
+  const handleBlobToggle = () => {
+    saveToHistory(); // Save current state before making changes
+    setIsBlobEnabled(prev => !prev);
+  };
+
+  // Handler for Black Hole toggle
+  const handleBlackHoleToggle = () => {
+    saveToHistory(); // Save current state before making changes
+    setIsBlackHoleEnabled(prev => !prev);
+  };
+
+  // Handler for Swarm toggle
+  const handleSwarmToggle = () => {
+    saveToHistory(); // Save current state before making changes
+    setIsSwarmEnabled(prev => !prev);
+  };
+
+  // Handler for Ribbon toggle
+  const handleRibbonToggle = () => {
+    saveToHistory(); // Save current state before making changes
+    setIsRibbonEnabled(prev => !prev);
+  };
+
+  // Handler for Splash toggle
+  const handleSplashToggle = () => {
+    saveToHistory(); // Save current state before making changes
+    setIsSplashEnabled(prev => !prev);
+  };
+
+  // Handler for Creatures toggle
+  const handleCreaturesToggle = () => {
+    saveToHistory(); // Save current state before making changes
+    setIsCreaturesEnabled(prev => !prev);
+  };
+
 
   const handleShufflePositions = () => {
     saveToHistory(); // Save current state before making changes
@@ -2277,7 +2356,7 @@ export default function Home() {
                 <span 
                   className="absolute bottom-2 right-3 text-xs text-white/70 font-medium"
                 >
-                  Version 1.0
+                  V2
                 </span>
               </div>
             </div>
@@ -2379,7 +2458,7 @@ export default function Home() {
           
           {/* Right side buttons */}
           <div className="flex items-center space-x-4">
-            <button className="text-gray-300 hover:text-white transition-colors">Upgrade</button>
+            <Link href="/upgrade" className="text-gray-300 hover:text-white transition-colors">Upgrade</Link>
             <button className="text-gray-300 hover:text-white transition-colors">Sign in</button>
             <button 
               className="text-gray-600 px-4 py-2 rounded-lg transition-colors relative overflow-hidden font-bold"
@@ -2409,7 +2488,7 @@ export default function Home() {
             </div>
             
             {/* Action Buttons */}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-2">
               <button 
                 onClick={handleGenerate}
                 disabled={isAnimating}
@@ -2420,7 +2499,7 @@ export default function Home() {
                 </svg>
                 <span>Generate</span>
               </button>
-              <button 
+              <button
                 onClick={handleCodeButtonClick}
                 className="flex items-center justify-center space-x-1 bg-gray-700 hover:bg-gray-600 text-white px-2 py-2 rounded-lg transition-colors text-sm"
               >
@@ -2428,6 +2507,15 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                 </svg>
                 <span>Code</span>
+              </button>
+              <button
+                onClick={handleExportButtonClick}
+                className="flex items-center justify-center space-x-1 bg-gray-700 hover:bg-gray-600 text-white px-2 py-2 rounded-lg transition-colors text-sm"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Export</span>
               </button>
               <button 
                 onClick={handleShufflePositions}
@@ -3037,6 +3125,46 @@ export default function Home() {
             drawingPaths={drawingPaths}
             onDrawingPathsChange={setDrawingPaths}
           />
+          <StarField 
+            key={`main-stars-${isEffectsEnabled}`}
+            isVisible={isEffectsEnabled} 
+            isFullscreen={false} 
+          />
+          <BlobField 
+            key={`main-blob-${isBlobEnabled}`}
+            isVisible={isBlobEnabled} 
+            isFullscreen={false} 
+          />
+          
+          <BlackHoleField 
+            key={`main-blackhole-${isBlackHoleEnabled}`}
+            isVisible={isBlackHoleEnabled} 
+            isFullscreen={false}
+          />
+          
+          <SwarmField 
+            key={`main-swarm-${isSwarmEnabled}`}
+            isVisible={isSwarmEnabled} 
+            isFullscreen={false}
+          />
+          
+          <RibbonField
+            key={`main-ribbon-${isRibbonEnabled}`}
+            isVisible={isRibbonEnabled}
+            isFullscreen={false}
+          />
+
+          <SplashField
+            key={`main-splash-${isSplashEnabled}`}
+            isVisible={isSplashEnabled}
+            isFullscreen={false}
+          />
+
+          <CreaturesField
+            key={`main-creatures-${isCreaturesEnabled}`}
+            isVisible={isCreaturesEnabled}
+            isFullscreen={false}
+          />
           
           {/* Rendered Stars */}
           {placedStars.map((star) => {
@@ -3509,6 +3637,130 @@ export default function Home() {
                   ? 'Multiple gradient types enabled - they will work together'
                   : 'No gradient types selected - individual textures will be used'}
               </p>
+              
+              {/* Effects Section */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-300 mb-2">Effects</label>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={handleEffectsToggle}
+                    className={`flex items-center justify-center w-10 h-10 rounded-lg border-2 transition-all duration-200 ${
+                      isEffectsEnabled
+                        ? 'bg-purple-500 border-purple-400 text-white shadow-lg'
+                        : 'bg-gray-700 border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
+                    }`}
+                    title="Star Effect"
+                  >
+                    <Sparkles className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={handleBlobToggle}
+                    className={`flex items-center justify-center w-10 h-10 rounded-lg border-2 transition-all duration-200 ${
+                      isBlobEnabled
+                        ? 'bg-blue-500 border-blue-400 text-white shadow-lg'
+                        : 'bg-gray-700 border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
+                    }`}
+                    title="Blob Effect"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                      <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleBlackHoleToggle}
+                    className={`flex items-center justify-center w-10 h-10 rounded-lg border-2 transition-all duration-200 ${
+                      isBlackHoleEnabled
+                        ? 'bg-black border-gray-600 text-white shadow-lg'
+                        : 'bg-gray-700 border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
+                    }`}
+                    title="Black Hole Effect"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" fill="currentColor"/>
+                      <circle cx="12" cy="12" r="6" fill="black"/>
+                      <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleSwarmToggle}
+                    className={`flex items-center justify-center w-10 h-10 rounded-lg border-2 transition-all duration-200 ${
+                      isSwarmEnabled
+                        ? 'bg-cyan-500 border-cyan-400 text-white shadow-lg'
+                        : 'bg-gray-700 border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
+                    }`}
+                    title="Swarm Effect"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <circle cx="8" cy="8" r="1.5"/>
+                      <circle cx="16" cy="8" r="1.5"/>
+                      <circle cx="12" cy="12" r="2"/>
+                      <circle cx="6" cy="16" r="1"/>
+                      <circle cx="18" cy="16" r="1"/>
+                      <circle cx="10" cy="6" r="0.8"/>
+                      <circle cx="14" cy="6" r="0.8"/>
+                      <circle cx="8" cy="14" r="0.8"/>
+                      <circle cx="16" cy="14" r="0.8"/>
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleRibbonToggle}
+                    className={`flex items-center justify-center w-10 h-10 rounded-lg border-2 transition-all duration-200 ${
+                      isRibbonEnabled
+                        ? 'bg-pink-500 border-pink-400 text-white shadow-lg'
+                        : 'bg-gray-700 border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
+                    }`}
+                    title="Ribbon Effect"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M3 12h18M3 12l4-4M3 12l4 4M21 12l-4-4M21 12l-4 4" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      <path d="M6 8h12M6 16h12" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                      <path d="M9 6h6M9 18h6" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleSplashToggle}
+                    className={`flex items-center justify-center w-10 h-10 rounded-lg border-2 transition-all duration-200 ${
+                      isSplashEnabled
+                        ? 'bg-orange-500 border-orange-400 text-white shadow-lg'
+                        : 'bg-gray-700 border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
+                    }`}
+                    title="Splash Effect"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      <circle cx="12" cy="12" r="7" stroke="currentColor" strokeWidth="1.5" fill="none" opacity="0.6"/>
+                      <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="1" fill="none" opacity="0.3"/>
+                      <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="1.5"/>
+                    </svg>
+                  </button>
+                  <button
+                    onClick={handleCreaturesToggle}
+                    className={`flex items-center justify-center w-10 h-10 rounded-lg border-2 transition-all duration-200 ${
+                      isCreaturesEnabled
+                        ? 'bg-red-500 border-red-400 text-white shadow-lg'
+                        : 'bg-gray-700 border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300'
+                    }`}
+                    title="Creatures Effect"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <circle cx="12" cy="8" r="2" fill="currentColor"/>
+                      <circle cx="8" cy="12" r="1.5" fill="currentColor" opacity="0.8"/>
+                      <circle cx="16" cy="12" r="1.5" fill="currentColor" opacity="0.8"/>
+                      <circle cx="6" cy="16" r="1" fill="currentColor" opacity="0.6"/>
+                      <circle cx="18" cy="16" r="1" fill="currentColor" opacity="0.6"/>
+                      <circle cx="10" cy="18" r="0.8" fill="currentColor" opacity="0.5"/>
+                      <circle cx="14" cy="18" r="0.8" fill="currentColor" opacity="0.5"/>
+                      <circle cx="12" cy="20" r="0.6" fill="currentColor" opacity="0.4"/>
+                      <circle cx="5" cy="10" r="0.8" fill="currentColor" opacity="0.5"/>
+                      <circle cx="19" cy="10" r="0.8" fill="currentColor" opacity="0.5"/>
+                      <circle cx="12" cy="5" r="1" fill="currentColor" opacity="0.7"/>
+                      <circle cx="9" cy="6" r="0.7" fill="currentColor" opacity="0.6"/>
+                      <circle cx="15" cy="6" r="0.7" fill="currentColor" opacity="0.6"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
             
             {/* Angle */}
@@ -3559,12 +3811,35 @@ export default function Home() {
       </div>
 
       {/* Code Modal */}
-      <CodeModal 
+      <CodeModal
         isOpen={isCodeModalOpen}
         onClose={() => setIsCodeModalOpen(false)}
         cssCode={generatedCSS}
+        generateCSS={(format) => gradientRef.current?.generateCSS(format) || ''}
         hasAnimation={isAnimating && keyframesLengthRef.current > 0}
       />
+
+      {/* Export Modal */}
+      {isExportModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">Export Gradient</h2>
+              <button
+                onClick={() => setIsExportModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-4">
+              <GradientExporter cssString={generatedCSS} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Fullscreen Modal */}
       {isFullscreen && (
@@ -3617,6 +3892,41 @@ export default function Home() {
               onImageSelect={handleImageSelect}
               onImageUpdate={handleImageUpdate}
               onImageDelete={handleImageDelete}
+            />
+            <StarField 
+              key={`fullscreen-stars-${fullscreenKey}`}
+              isVisible={isEffectsEnabled} 
+              isFullscreen={true} 
+            />
+            <BlobField 
+              key={`fullscreen-blob-${fullscreenKey}`}
+              isVisible={isBlobEnabled} 
+              isFullscreen={true} 
+            />
+            <BlackHoleField 
+              key={`fullscreen-blackhole-${fullscreenKey}`}
+              isVisible={isBlackHoleEnabled} 
+              isFullscreen={true}
+            />
+            <SwarmField 
+              key={`fullscreen-swarm-${fullscreenKey}`}
+              isVisible={isSwarmEnabled} 
+              isFullscreen={true}
+            />
+            <RibbonField
+              key={`fullscreen-ribbon-${fullscreenKey}`}
+              isVisible={isRibbonEnabled}
+              isFullscreen={true}
+            />
+            <SplashField
+              key={`fullscreen-splash-${fullscreenKey}`}
+              isVisible={isSplashEnabled}
+              isFullscreen={true}
+            />
+            <CreaturesField
+              key={`fullscreen-creatures-${fullscreenKey}`}
+              isVisible={isCreaturesEnabled}
+              isFullscreen={true}
             />
           </div>
           

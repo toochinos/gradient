@@ -52,7 +52,7 @@ interface GradientGeneratorProps {
   backgroundColor?: string;
   hideControls?: boolean;
   meshPoints?: MeshPoint[];
-  gradientType?: 'linear' | 'radial' | 'circular' | 'nothing';
+  gradientType?: 'linear' | 'radial' | 'circular' | 'effects' | 'nothing';
   gradientAngle?: number;
   enabledGradientTypes?: {
     linear: boolean;
@@ -104,7 +104,7 @@ interface GradientGeneratorProps {
 }
 
 export interface GradientGeneratorRef {
-  generateCSS: () => string;
+  generateCSS: (format?: 'html' | 'react' | 'css') => string;
   addMeshPoint: (color: string) => void;
   removeMeshPoint: (pointId: string) => void;
   getMeshPoints: () => MeshPoint[];
@@ -115,7 +115,7 @@ export interface GradientGeneratorRef {
 }
 
 const GradientGenerator = forwardRef<GradientGeneratorRef, GradientGeneratorProps>(
-  ({ onCSSGenerate, onMeshPointsChange, onPointSelect, selectedColorId, backgroundColor = '#111827', hideControls = false, meshPoints: propMeshPoints, gradientType = 'circular', gradientAngle = 0, enabledGradientTypes = { linear: false, radial: false, circular: false }, addNoise = false, noiseIntensity = 12, isDrawingMode = false, penColor = '#ffffff', penThickness = 0.2, penFadeLeft = 0, penFadeRight = 0, selectedShape = null, uploadedImages = [], selectedImageId = null, onImageSelect, onImageUpdate, onImageDelete, drawingPaths = [], onDrawingPathsChange }, ref) => {
+  ({ onCSSGenerate, onMeshPointsChange, onPointSelect, selectedColorId, backgroundColor = '#111827', hideControls = false, meshPoints: propMeshPoints, gradientType = 'circular', gradientAngle = 0, enabledGradientTypes = { linear: false, radial: false, circular: false, effects: false }, addNoise = false, noiseIntensity = 12, isDrawingMode = false, penColor = '#ffffff', penThickness = 0.2, penFadeLeft = 0, penFadeRight = 0, selectedShape = null, uploadedImages = [], selectedImageId = null, onImageSelect, onImageUpdate, onImageDelete, drawingPaths = [], onDrawingPathsChange }, ref) => {
   const defaultMeshPoints = [
     { id: '1', x: 30, y: 40, color: '#0DD162', blur: 100 },
     { id: '2', x: 70, y: 60, color: '#0D7CD1', blur: 100 },
@@ -683,7 +683,7 @@ const GradientGenerator = forwardRef<GradientGeneratorRef, GradientGeneratorProp
     updateMeshPoints(newPoints);
   }, [meshPoints, updateMeshPoints]);
 
-  const generateMeshGradientCSS = () => {
+  const generateMeshGradientCSS = (format: 'html' | 'react' | 'css' = 'html') => {
     // Helper function for CSS color conversion
     const getRgbaFromColorCSS = (color: string, alpha: number) => {
       if (color.startsWith('hsl')) {
@@ -1038,11 +1038,61 @@ ${visiblePoints.map((_, index) => `  <div class="layer-${index + 1}"></div>`).jo
     }
 
     const noiseCSS = generateNoiseCSS();
-    return `${htmlStructure}\n\n/* CSS */\n${gradientCSS}${noiseCSS}`;
+    const fullCSS = `${gradientCSS}${noiseCSS}`;
+    
+    if (format === 'css') {
+      return fullCSS;
+    }
+    
+    if (format === 'react') {
+      const visiblePoints = meshPoints.filter(point => !point.hideColor);
+      const layerElements = visiblePoints.map((_, index) => 
+        `    <div className="individual-layer-${index + 1}"></div>`
+      ).join('\n');
+      
+      return `import React from 'react';
+
+const MeshGradient = () => {
+  return (
+    <div className="mesh-gradient">
+${layerElements}
+    </div>
+  );
+};
+
+export default MeshGradient;
+
+<style jsx>{\`
+${fullCSS}
+\`}</style>`;
+    }
+    
+    // HTML format (default)
+    const visiblePoints = meshPoints.filter(point => !point.hideColor);
+    const layerElements = visiblePoints.map((_, index) => 
+      `  <div class="individual-layer-${index + 1}"></div>`
+    ).join('\n');
+    
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesh Gradient</title>
+    <style>
+${fullCSS}
+    </style>
+</head>
+<body>
+    <div class="mesh-gradient">
+${layerElements}
+    </div>
+</body>
+</html>`;
   };
 
   useImperativeHandle(ref, () => ({
-    generateCSS: generateMeshGradientCSS,
+    generateCSS: (format: 'html' | 'react' | 'css' = 'html') => generateMeshGradientCSS(format),
     addMeshPoint: addMeshPoint,
     removeMeshPoint: removeMeshPoint,
     getMeshPoints: getMeshPoints,
@@ -1097,7 +1147,7 @@ ${visiblePoints.map((_, index) => `  <div class="layer-${index + 1}"></div>`).jo
     const gradientLayers: JSX.Element[] = [];
 
     // If any gradient types are enabled, render them as background layers
-    if (enabledGradientTypes.linear || enabledGradientTypes.radial || enabledGradientTypes.circular) {
+    if (enabledGradientTypes.linear || enabledGradientTypes.radial || enabledGradientTypes.circular || enabledGradientTypes.effects) {
       // Linear gradient layer
       if (enabledGradientTypes.linear) {
         const linearPoints = visiblePoints.filter(point => point.textureType === 'linear' || !point.textureType);
@@ -1176,6 +1226,33 @@ ${visiblePoints.map((_, index) => `  <div class="layer-${index + 1}"></div>`).jo
                   transform: `scale(${circularScale})`,
                   transformOrigin: `${point.x}% ${point.y}%`,
                   ...(blurValue > 0 ? { filter: `blur(${blurValue * 0.15}px)` } : {})
+                }}
+              />
+            );
+          });
+        }
+      }
+
+      // Effects gradient layer
+      if (enabledGradientTypes.effects) {
+        const effectsPoints = visiblePoints.filter(point => point.textureType === 'circular' || !point.textureType);
+        if (effectsPoints.length > 0) {
+          effectsPoints.forEach((point, index) => {
+            const blurValue = Math.max(0, point.blur || 100);
+            const effectsSpread = Math.min(150, Math.max(30, 40 + (blurValue / 200) * 110));
+            const effectsOpacity = Math.min(1, Math.max(0.4, 0.2 + (blurValue / 200) * 0.8));
+            const effectsScale = Math.min(3, Math.max(1.5, 1.0 + (blurValue / 200) * 2.0));
+            
+            gradientLayers.push(
+              <div
+                key={`effects-gradient-${point.id}`}
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: `radial-gradient(circle at ${point.x}% ${point.y}%, ${point.color} 0%, ${getRgbaFromColor(point.color, 0.8)} 10%, ${getRgbaFromColor(point.color, 0.6)} 25%, ${getRgbaFromColor(point.color, 0.4)} 45%, ${getRgbaFromColor(point.color, 0.2)} 70%, transparent ${effectsSpread}%)`,
+                  opacity: effectsOpacity,
+                  transform: `scale(${effectsScale})`,
+                  transformOrigin: `${point.x}% ${point.y}%`,
+                  ...(blurValue > 0 ? { filter: `blur(${blurValue * 0.2}px) brightness(1.2) saturate(1.3)` } : {})
                 }}
               />
             );
