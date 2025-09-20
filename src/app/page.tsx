@@ -18,7 +18,6 @@ import ColorPicker from '@/components/ColorPicker';
 import SketchColorPicker from '@/components/SketchColorPicker';
 import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { Camera, ImageUp, RemoveFormatting, Bot, Sparkles, Pipette, PaintRoller, FireExtinguisher, CircleDashed, Shapes, Copy } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import GIF from 'gif.js';
 import html2canvas from 'html2canvas';
