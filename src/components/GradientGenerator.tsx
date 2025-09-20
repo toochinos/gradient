@@ -1206,7 +1206,7 @@ ${layerElements}
     const gradientLayers: JSX.Element[] = [];
 
     // If any gradient types are enabled, render them as background layers
-    if (enabledGradientTypes.linear || enabledGradientTypes.radial || enabledGradientTypes.circular || enabledGradientTypes.effects) {
+    if (enabledGradientTypes.linear || enabledGradientTypes.radial || enabledGradientTypes.circular || (enabledGradientTypes as { effects?: boolean }).effects) {
       // Linear gradient layer
       if (enabledGradientTypes.linear) {
         const linearPoints = visiblePoints.filter(point => point.textureType === 'linear' || !point.textureType);
@@ -1293,7 +1293,7 @@ ${layerElements}
       }
 
       // Effects gradient layer
-      if (enabledGradientTypes.effects) {
+      if ((enabledGradientTypes as { effects?: boolean }).effects) {
         const effectsPoints = visiblePoints.filter(point => point.textureType === 'circular' || !point.textureType);
         if (effectsPoints.length > 0) {
           effectsPoints.forEach((point, index) => {

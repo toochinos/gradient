@@ -11,11 +11,11 @@ interface BlobFieldProps {
 
 const BlobField: React.FC<BlobFieldProps> = ({ isVisible, className = '', isFullscreen = false }) => {
   const mountRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<THREE.Scene>();
-  const rendererRef = useRef<THREE.WebGLRenderer>();
-  const cameraRef = useRef<THREE.PerspectiveCamera>();
-  const blobRef = useRef<THREE.Mesh>();
-  const animationIdRef = useRef<number>();
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const blobRef = useRef<THREE.Mesh | null>(null);
+  const animationIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!mountRef.current || !isVisible) return;
@@ -126,7 +126,9 @@ const BlobField: React.FC<BlobFieldProps> = ({ isVisible, className = '', isFull
         
         // Color animation
         const hue = (time * 0.1) % 1;
-        blobRef.current.material.color.setHSL(hue, 0.7, 0.6);
+        if (blobRef.current.material && 'color' in blobRef.current.material) {
+          (blobRef.current.material as THREE.MeshBasicMaterial).color.setHSL(hue, 0.7, 0.6);
+        }
         
         // Enhanced effects for fullscreen
         if (isFullscreen) {

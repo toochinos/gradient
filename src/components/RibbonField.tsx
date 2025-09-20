@@ -129,7 +129,7 @@ export default function RibbonField({ isVisible, isFullscreen }: RibbonFieldProp
 
       for (let n = 0; n < tickSpeedRef.current; n++) {
         for (let i = 0; i < pointsRef.current.length; i++) {
-          pointsRef.current[i].update();
+          (pointsRef.current[i] as any).update();
         }
         ticksRef.current++;
       }
