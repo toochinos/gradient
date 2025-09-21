@@ -2374,7 +2374,7 @@ export default function Home() {
                   .Pro
                 </span>
                 <span 
-                  className="absolute bottom-2 right-3 text-xs text-white/70 font-medium"
+                  className="absolute bottom-2 right-3 text-xs text-white font-medium"
                 >
                   V2.0
                 </span>
