@@ -11,6 +11,7 @@ interface WebGLGradientRendererProps {
   width?: number;
   height?: number;
   onWebGLContext?: (gl: WebGLRenderingContext) => void;
+  onCanvasReady?: (canvas: HTMLCanvasElement) => void;
 }
 
 interface WebGLProgram {
@@ -36,7 +37,8 @@ export default function WebGLGradientRenderer({
   backgroundColor,
   width = 800,
   height = 600,
-  onWebGLContext
+  onWebGLContext,
+  onCanvasReady
 }: WebGLGradientRendererProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
@@ -134,7 +136,8 @@ export default function WebGLGradientRenderer({
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true }) ||
+               canvas.getContext('experimental-webgl', { preserveDrawingBuffer: true });
     
     if (!gl) {
       setIsWebGLSupported(false);
@@ -144,6 +147,7 @@ export default function WebGLGradientRenderer({
 
     glRef.current = gl;
     onWebGLContext?.(gl);
+    onCanvasReady?.(canvas);
 
     // Vertex shader source
     const vertexShaderSource = `

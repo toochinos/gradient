@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import GradientGenerator, { GradientGeneratorRef, MeshPoint } from '@/components/GradientGenerator';
+import WebGLGradientRenderer from '@/components/WebGLGradientRenderer';
+import FocusedGradientRecorder from '@/components/FocusedGradientRecorder';
 import CookieBanner from '@/components/CookieBanner';
 import CodeModal from '@/components/CodeModal';
 import GradientExporter from '@/components/GradientExporter';
@@ -115,6 +117,10 @@ export default function Home() {
   const [isSplashEnabled, setIsSplashEnabled] = useState(false);
   const [isCreaturesEnabled, setIsCreaturesEnabled] = useState(false);
   const [gradientAngle, setGradientAngle] = useState(0);
+  const [isWebGLMode, setIsWebGLMode] = useState(false);
+  const [webglCanvas, setWebglCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [gradientContainer, setGradientContainer] = useState<HTMLDivElement | null>(null);
+  const [fullscreenContainer, setFullscreenContainer] = useState<HTMLDivElement | null>(null);
   const [meshPoints, setMeshPoints] = useState<MeshPoint[]>([
     { id: '1', x: 30, y: 40, color: '#0DD162', name: 'Bright Green', blur: 100, hideColor: false, hideBalls: false, textureType: 'circular' },
     { id: '2', x: 70, y: 60, color: '#0D7CD1', name: 'Blue', blur: 100, hideColor: false, hideBalls: false, textureType: 'circular' }
@@ -2376,7 +2382,7 @@ export default function Home() {
                 <span 
                   className="absolute bottom-2 right-3 text-xs text-white/70 font-medium"
                 >
-                  V2.0
+                  V4
                 </span>
               </div>
             </div>
@@ -2467,13 +2473,28 @@ export default function Home() {
             </div>
 
             {/* Shapes Icon */}
-            <div 
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 cursor-pointer transition-colors" 
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 cursor-pointer transition-colors"
               title="Add shapes"
               onClick={handlePremiumFeatureClick}
             >
               <Shapes className="w-5 h-5" />
             </div>
+
+            {/* WebGL Toggle */}
+            <button
+              onClick={() => setIsWebGLMode(!isWebGLMode)}
+              className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${
+                isWebGLMode
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
+              }`}
+              title={isWebGLMode ? "Switch to CSS rendering" : "Switch to WebGL rendering"}
+            >
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </button>
           </div>
           
           {/* Right side buttons */}
@@ -3191,30 +3212,44 @@ export default function Home() {
         </div>
 
         {/* Center Gradient Preview Area */}
-        <div 
-          className="flex-1 w-full h-full md:h-full overflow-hidden relative -mt-4 md:mt-0 min-h-0 gradient-preview-area" 
+        <div
+          ref={setGradientContainer}
+          className="flex-1 w-full h-full md:h-full overflow-hidden relative -mt-4 md:mt-0 min-h-0 gradient-preview-area"
           style={{ backgroundColor: backgroundColor }}
           onClick={handleGradientClick}
         >
-          <GradientGenerator 
-            key={`main-${isAnimating ? currentKeyframe : 'static'}`}
-            ref={gradientRef} 
-            selectedColorId={selectedColorId || undefined} 
-            backgroundColor={backgroundColor}
-            meshPoints={getCurrentMeshPoints()}
-            onMeshPointsChange={handleFullscreenMeshPointsChange}
-            onPointSelect={handlePointSelect}
-            gradientType={gradientType}
-            gradientAngle={gradientAngle}
-            enabledGradientTypes={enabledGradientTypes}
-            isDrawingMode={isDrawingMode}
-            penColor={penColor}
-            penThickness={penThickness}
-            penFadeLeft={penFadeLeft}
-            penFadeRight={penFadeRight}
-            drawingPaths={drawingPaths}
-            onDrawingPathsChange={setDrawingPaths}
-          />
+          {isWebGLMode ? (
+            <WebGLGradientRenderer
+              key={`webgl-main-${isAnimating ? currentKeyframe : 'static'}`}
+              meshPoints={getCurrentMeshPoints()}
+              gradientType={gradientType}
+              gradientAngle={gradientAngle}
+              backgroundColor={backgroundColor}
+              width={800}
+              height={600}
+              onCanvasReady={setWebglCanvas}
+            />
+          ) : (
+            <GradientGenerator
+              key={`main-${isAnimating ? currentKeyframe : 'static'}`}
+              ref={gradientRef}
+              selectedColorId={selectedColorId || undefined}
+              backgroundColor={backgroundColor}
+              meshPoints={getCurrentMeshPoints()}
+              onMeshPointsChange={handleFullscreenMeshPointsChange}
+              onPointSelect={handlePointSelect}
+              gradientType={gradientType}
+              gradientAngle={gradientAngle}
+              enabledGradientTypes={enabledGradientTypes}
+              isDrawingMode={isDrawingMode}
+              penColor={penColor}
+              penThickness={penThickness}
+              penFadeLeft={penFadeLeft}
+              penFadeRight={penFadeRight}
+              drawingPaths={drawingPaths}
+              onDrawingPathsChange={setDrawingPaths}
+            />
+          )}
           <StarField 
             key={`main-stars-${isEffectsEnabled}`}
             isVisible={isEffectsEnabled} 
@@ -3255,7 +3290,26 @@ export default function Home() {
             isVisible={isCreaturesEnabled}
             isFullscreen={false}
           />
-          
+
+          {/* Focused Recording Controls - Records WebGL area without screen sharing */}
+          {gradientContainer && (
+            <div className="absolute bottom-4 right-4 z-50">
+              <div className="bg-black/80 backdrop-blur-sm border border-gray-600 rounded-lg p-4 shadow-xl">
+                <FocusedGradientRecorder
+                  targetElement={gradientContainer}
+                  duration={5}
+                  fps={30}
+                  isWebGLMode={isWebGLMode}
+                  webglCanvas={webglCanvas}
+                  onRecordingComplete={(blob) => {
+                    const mode = isWebGLMode ? 'WebGL' : 'CSS + Three.js';
+                    console.log(`${mode} recording completed:`, blob.size, 'bytes');
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Rendered Stars */}
           {placedStars.map((star) => {
             const starData = starTypes.find(s => s.id === star.starType);
@@ -3959,30 +4013,47 @@ export default function Home() {
           
 
           {/* Fullscreen Gradient Display */}
-          <div className="w-full h-full" style={{ backgroundColor: backgroundColor }}>
-            <GradientGenerator 
-              key={`fullscreen-${fullscreenKey}-${isAnimating ? currentKeyframe : 'static'}`}
-              backgroundColor={backgroundColor}
-              hideControls={true}
-              meshPoints={getCurrentMeshPoints()}
-              onPointSelect={handlePointSelect}
-              gradientType={gradientType}
-              gradientAngle={gradientAngle}
-              enabledGradientTypes={enabledGradientTypes}
-              isDrawingMode={isDrawingMode}
-              penColor={penColor}
-              penThickness={penThickness}
-              penFadeLeft={penFadeLeft}
-              penFadeRight={penFadeRight}
-              drawingPaths={drawingPaths}
-              onDrawingPathsChange={setDrawingPaths}
-              selectedShape={selectedShape}
-              uploadedImages={uploadedImages}
-              selectedImageId={selectedImageId}
-              onImageSelect={handleImageSelect}
-              onImageUpdate={handleImageUpdate}
-              onImageDelete={handleImageDelete}
-            />
+          <div
+            ref={setFullscreenContainer}
+            className="w-full h-full"
+            style={{ backgroundColor: backgroundColor }}
+          >
+            {isWebGLMode ? (
+              <WebGLGradientRenderer
+                key={`webgl-fullscreen-${fullscreenKey}-${isAnimating ? currentKeyframe : 'static'}`}
+                meshPoints={getCurrentMeshPoints()}
+                gradientType={gradientType}
+                gradientAngle={gradientAngle}
+                backgroundColor={backgroundColor}
+                width={typeof window !== 'undefined' ? window.innerWidth : 1920}
+                height={typeof window !== 'undefined' ? window.innerHeight : 1080}
+                onCanvasReady={setWebglCanvas}
+              />
+            ) : (
+              <GradientGenerator
+                key={`fullscreen-${fullscreenKey}-${isAnimating ? currentKeyframe : 'static'}`}
+                backgroundColor={backgroundColor}
+                hideControls={true}
+                meshPoints={getCurrentMeshPoints()}
+                onPointSelect={handlePointSelect}
+                gradientType={gradientType}
+                gradientAngle={gradientAngle}
+                enabledGradientTypes={enabledGradientTypes}
+                isDrawingMode={isDrawingMode}
+                penColor={penColor}
+                penThickness={penThickness}
+                penFadeLeft={penFadeLeft}
+                penFadeRight={penFadeRight}
+                drawingPaths={drawingPaths}
+                onDrawingPathsChange={setDrawingPaths}
+                selectedShape={selectedShape}
+                uploadedImages={uploadedImages}
+                selectedImageId={selectedImageId}
+                onImageSelect={handleImageSelect}
+                onImageUpdate={handleImageUpdate}
+                onImageDelete={handleImageDelete}
+              />
+            )}
             <StarField 
               key={`fullscreen-stars-${fullscreenKey}`}
               isVisible={isEffectsEnabled} 
@@ -4018,8 +4089,27 @@ export default function Home() {
               isVisible={isCreaturesEnabled}
               isFullscreen={true}
             />
+
+            {/* Fullscreen Focused Recording Controls */}
+            {fullscreenContainer && (
+              <div className="absolute bottom-6 right-6 z-50">
+                <div className="bg-black/80 backdrop-blur-sm border border-gray-600 rounded-lg p-4 shadow-xl">
+                  <FocusedGradientRecorder
+                    targetElement={fullscreenContainer}
+                    duration={10}
+                    fps={60}
+                    isWebGLMode={isWebGLMode}
+                    webglCanvas={webglCanvas}
+                    onRecordingComplete={(blob) => {
+                      const mode = isWebGLMode ? 'WebGL' : 'CSS + Three.js';
+                      console.log(`Fullscreen ${mode} recording completed:`, blob.size, 'bytes');
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
-          
+
         </div>
       )}
 
