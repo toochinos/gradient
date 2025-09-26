@@ -6,6 +6,7 @@ import WebGLGradientRenderer from '@/components/WebGLGradientRenderer';
 import FocusedGradientRecorder from '@/components/FocusedGradientRecorder';
 import CookieBanner from '@/components/CookieBanner';
 import CodeModal from '@/components/CodeModal';
+import EmailPopup from '@/components/EmailPopup';
 import GradientExporter from '@/components/GradientExporter';
 import StarField from '@/components/StarField';
 import BlobField from '@/components/BlobField';
@@ -147,6 +148,7 @@ export default function Home() {
     rotation: number;
     isSelected: boolean;
   }>>([]);
+  const [isEmailPopupOpen, setIsEmailPopupOpen] = useState(false);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [penThickness, setPenThickness] = useState(3);
@@ -2277,6 +2279,14 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [animationStartTime]);
 
+  // Email popup timer - show after 1 minute of usage
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsEmailPopupOpen(true);
+    }, 60000); // 60 seconds = 1 minute
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -2481,20 +2491,7 @@ export default function Home() {
               <Shapes className="w-5 h-5" />
             </div>
 
-            {/* WebGL Toggle */}
-            <button
-              onClick={() => setIsWebGLMode(!isWebGLMode)}
-              className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${
-                isWebGLMode
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700'
-              }`}
-              title={isWebGLMode ? "Switch to CSS rendering" : "Switch to WebGL rendering"}
-            >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-              </svg>
-            </button>
+            {/* WebGL Toggle moved to background color section */}
           </div>
           
           {/* Right side buttons */}
@@ -2540,7 +2537,7 @@ export default function Home() {
               </div>
               
               {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <button 
                   onClick={handleGenerate}
                   disabled={isAnimating}
@@ -2560,15 +2557,7 @@ export default function Home() {
                   </svg>
                   <span>Code</span>
                 </button>
-                <button
-                  onClick={handleExportButtonClick}
-                  className="flex items-center justify-center space-x-1 bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <span>Export</span>
-                </button>
+                {/* Export button removed */}
                 <button 
                   onClick={handleShufflePositions}
                   disabled={isAnimating}
@@ -2599,7 +2588,7 @@ export default function Home() {
             </div>
             
             {/* Action Buttons */}
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <button 
                 onClick={handleGenerate}
                 disabled={isAnimating}
@@ -2619,15 +2608,7 @@ export default function Home() {
                 </svg>
                 <span>Code</span>
               </button>
-              <button
-                onClick={handleExportButtonClick}
-                className="flex items-center justify-center space-x-1 bg-gray-700 hover:bg-gray-600 text-white px-2 py-2 rounded-lg transition-colors text-sm"
-              >
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span>Export</span>
-              </button>
+              {/* Export button removed */}
               <button 
                 onClick={handleShufflePositions}
                 disabled={isAnimating}
@@ -3228,6 +3209,9 @@ export default function Home() {
               width={800}
               height={600}
               onCanvasReady={setWebglCanvas}
+              onMeshPointsChange={handleFullscreenMeshPointsChange}
+              onPointSelect={handlePointSelect}
+              selectedColorId={selectedColorId || undefined}
             />
           ) : (
             <GradientGenerator
@@ -3590,47 +3574,13 @@ export default function Home() {
             {/* Button Grid */}
             <div className="grid grid-cols-2 gap-2">
               
-              <button
-                onClick={handleDownloadClick}
-                disabled={isAnimating}
-                className="flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-500 text-white px-4 py-3 rounded-lg transition-colors w-32 h-12 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                <span className="text-xs">Download</span>
-              </button>
+              {/* Download button removed */}
               
               <div className="relative">
-                <button
-                  onClick={() => {
-                    setIsShareDropdownOpen(!isShareDropdownOpen);
-                    setIsShareArrowRotated(!isShareArrowRotated);
-                  }}
-                  className="flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-500 text-white px-4 py-3 rounded-lg transition-colors w-32 h-12"
-                  title="Save as options"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-                  </svg>
-                  <span className="text-xs">Save As</span>
-                  <svg className={`w-3 h-3 transition-transform ${isShareArrowRotated ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </button>
+                {/* Save As button removed */}
                 
                 {isShareDropdownOpen && (
-                  <div className="absolute top-full left-0 mt-1 w-40 bg-gray-700 rounded-lg shadow-lg border border-gray-600 z-50">
-                    <button
-                      onClick={handleShareFacebook}
-                      className="w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-600 rounded-lg transition-colors flex items-center space-x-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                      </svg>
-                      <span>PNG</span>
-                    </button>
-                  </div>
+                  <div className="absolute top-full left-0 mt-1 w-40 bg-gray-700 rounded-lg shadow-lg border border-gray-600 z-50"></div>
                 )}
               </div>
               
@@ -3728,6 +3678,37 @@ export default function Home() {
                   ></div>
                 </div>
                 <span className="text-sm text-gray-300">{backgroundColor}</span>
+                
+                {/* Rendering Switcher */}
+                <div className="relative group">
+                  <button
+                    onClick={() => setIsWebGLMode(!isWebGLMode)}
+                    className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 hover:scale-110 ${
+                      isWebGLMode
+                        ? 'bg-blue-600 text-white hover:bg-blue-700 border-blue-400'
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700 border-gray-600 hover:border-gray-500'
+                    }`}
+                    title="Renderer Switcher"
+                  >
+                    <svg className="w-6 h-6 transition-transform duration-300 group-hover:rotate-12" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                  </button>
+                  
+                  {/* Hover Options */}
+                  <div className="absolute top-0 left-12 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0 pointer-events-none">
+                    <div className="bg-gray-800 border border-gray-600 rounded-lg p-2 shadow-lg">
+                      <div className="flex space-x-2">
+                        <div className={`px-2 py-1 rounded text-xs ${!isWebGLMode ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
+                          CSS
+                        </div>
+                        <div className={`px-2 py-1 rounded text-xs ${isWebGLMode ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
+                          WebGL
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -4028,6 +4009,9 @@ export default function Home() {
                 width={typeof window !== 'undefined' ? window.innerWidth : 1920}
                 height={typeof window !== 'undefined' ? window.innerHeight : 1080}
                 onCanvasReady={setWebglCanvas}
+                onMeshPointsChange={handleFullscreenMeshPointsChange}
+                onPointSelect={handlePointSelect}
+                selectedColorId={selectedColorId || undefined}
               />
             ) : (
               <GradientGenerator
@@ -4254,6 +4238,12 @@ export default function Home() {
         onChange={handleImageUpload}
         accept="image/*"
         style={{ display: 'none' }}
+      />
+
+      {/* Email Popup */}
+      <EmailPopup
+        isOpen={isEmailPopupOpen}
+        onClose={() => setIsEmailPopupOpen(false)}
       />
 
     </div>
