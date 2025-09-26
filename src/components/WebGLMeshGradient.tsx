@@ -118,7 +118,7 @@ export default function WebGLMeshGradient({
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    const gl = canvas.getContext('webgl') as WebGLRenderingContext || canvas.getContext('experimental-webgl') as WebGLRenderingContext;
     
     if (!gl) {
       setIsWebGLSupported(false);

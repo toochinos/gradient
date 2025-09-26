@@ -14,7 +14,7 @@ interface WebGLGradientRendererProps {
   onCanvasReady?: (canvas: HTMLCanvasElement) => void;
 }
 
-interface WebGLProgram {
+interface CustomWebGLProgram {
   program: WebGLProgram;
   attribLocations: {
     vertexPosition: number;
@@ -114,7 +114,7 @@ export default function WebGLGradientRenderer({
   };
 
   // Create program
-  const createProgram = (gl: WebGLRenderingContext, vertexShader: WebGLShader, fragmentShader: WebGLShader): WebGLProgram | null => {
+  const createProgram = (gl: WebGLRenderingContext, vertexShader: WebGLShader, fragmentShader: WebGLShader): CustomWebGLProgram | null => {
     const program = gl.createProgram();
     if (!program) return null;
     
@@ -128,7 +128,21 @@ export default function WebGLGradientRenderer({
       return null;
     }
     
-    return program;
+    return {
+      program,
+      attribLocations: {
+        vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
+        vertexColor: gl.getAttribLocation(program, 'aVertexColor')
+      },
+      uniformLocations: {
+        resolution: gl.getUniformLocation(program, 'uResolution'),
+        time: gl.getUniformLocation(program, 'uTime'),
+        gradientAngle: gl.getUniformLocation(program, 'uGradientAngle'),
+        backgroundColor: gl.getUniformLocation(program, 'uBackgroundColor'),
+        meshPoints: gl.getUniformLocation(program, 'uMeshPoints'),
+        meshPointsCount: gl.getUniformLocation(program, 'uMeshPointsCount')
+      }
+    };
   };
 
   // Initialize WebGL
@@ -136,8 +150,8 @@ export default function WebGLGradientRenderer({
     if (!canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true }) ||
-               canvas.getContext('experimental-webgl', { preserveDrawingBuffer: true });
+    const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true }) as WebGLRenderingContext ||
+               canvas.getContext('experimental-webgl', { preserveDrawingBuffer: true }) as WebGLRenderingContext;
     
     if (!gl) {
       setIsWebGLSupported(false);
@@ -318,7 +332,7 @@ export default function WebGLGradientRenderer({
     }
 
     // Get attribute and uniform locations
-    const programInfo: WebGLProgram = {
+    const programInfo: CustomWebGLProgram = {
       program,
       attribLocations: {
         vertexPosition: gl.getAttribLocation(program, 'a_position'),

@@ -124,7 +124,7 @@ export default function WebGLDemo() {
               <label className="block text-sm font-medium mb-2">Gradient Type</label>
               <select
                 value={gradientType}
-                onChange={(e) => setGradientType(e.target.value as any)}
+                onChange={(e) => setGradientType(e.target.value as 'circular' | 'linear' | 'radial' | 'effects' | 'nothing')}
                 className="w-full p-2 bg-gray-800 border border-gray-600 rounded-lg text-white"
               >
                 <option value="circular">Circular</option>

@@ -2,7 +2,13 @@
 
 import dynamic from 'next/dynamic';
 
-const WebGLUnifiedSceneRecorder = dynamic(() => import('@/components/WebGLUnifiedSceneRecorder'), { ssr: false });
+const WebGLUnifiedSceneRecorder = dynamic(
+  () => import('@/components/WebGLUnifiedSceneRecorder'),
+  { 
+    ssr: false,
+    loading: () => <div>Loading...</div>
+  }
+);
 
 export default function UnifiedRecorderPage() {
   return (

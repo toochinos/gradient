@@ -72,7 +72,6 @@ export default function HybridGradientRecorder({
         try {
           const displayStream = await navigator.mediaDevices.getDisplayMedia({
             video: {
-              mediaSource: 'screen' as any,
               width: { ideal: targetElement?.clientWidth || 1920 },
               height: { ideal: targetElement?.clientHeight || 1080 },
               frameRate: { ideal: fps }

@@ -40,7 +40,6 @@ export default function UniversalGradientRecorder({
           // Try to use the newer getDisplayMedia API with area selection
           const displayStream = await navigator.mediaDevices.getDisplayMedia({
             video: {
-              mediaSource: 'screen',
               width: { ideal: targetElement.clientWidth },
               height: { ideal: targetElement.clientHeight },
               frameRate: { ideal: fps }

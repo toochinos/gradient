@@ -3209,9 +3209,6 @@ export default function Home() {
               width={800}
               height={600}
               onCanvasReady={setWebglCanvas}
-              onMeshPointsChange={handleFullscreenMeshPointsChange}
-              onPointSelect={handlePointSelect}
-              selectedColorId={selectedColorId || undefined}
             />
           ) : (
             <GradientGenerator
@@ -4009,9 +4006,6 @@ export default function Home() {
                 width={typeof window !== 'undefined' ? window.innerWidth : 1920}
                 height={typeof window !== 'undefined' ? window.innerHeight : 1080}
                 onCanvasReady={setWebglCanvas}
-                onMeshPointsChange={handleFullscreenMeshPointsChange}
-                onPointSelect={handlePointSelect}
-                selectedColorId={selectedColorId || undefined}
               />
             ) : (
               <GradientGenerator
