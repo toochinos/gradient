@@ -131,16 +131,16 @@ export default function WebGLGradientRenderer({
     return {
       program,
       attribLocations: {
-        vertexPosition: gl.getAttribLocation(program, 'aVertexPosition'),
-        vertexColor: gl.getAttribLocation(program, 'aVertexColor')
+        vertexPosition: gl.getAttribLocation(program, 'a_position'),
+        vertexColor: gl.getAttribLocation(program, 'a_texCoord')
       },
       uniformLocations: {
-        resolution: gl.getUniformLocation(program, 'uResolution'),
-        time: gl.getUniformLocation(program, 'uTime'),
-        gradientAngle: gl.getUniformLocation(program, 'uGradientAngle'),
-        backgroundColor: gl.getUniformLocation(program, 'uBackgroundColor'),
-        meshPoints: gl.getUniformLocation(program, 'uMeshPoints'),
-        meshPointsCount: gl.getUniformLocation(program, 'uMeshPointsCount')
+        resolution: gl.getUniformLocation(program, 'u_resolution'),
+        time: gl.getUniformLocation(program, 'u_time'),
+        gradientAngle: gl.getUniformLocation(program, 'u_gradientAngle'),
+        backgroundColor: gl.getUniformLocation(program, 'u_backgroundColor'),
+        meshPoints: gl.getUniformLocation(program, 'u_meshPoints'),
+        meshPointsCount: gl.getUniformLocation(program, 'u_meshPointsCount')
       }
     };
   };
@@ -331,24 +331,8 @@ export default function WebGLGradientRenderer({
       return;
     }
 
-    // Get attribute and uniform locations
-    const programInfo: CustomWebGLProgram = {
-      program,
-      attribLocations: {
-        vertexPosition: gl.getAttribLocation(program, 'a_position'),
-        vertexColor: gl.getAttribLocation(program, 'a_texCoord')
-      },
-      uniformLocations: {
-        resolution: gl.getUniformLocation(program, 'u_resolution'),
-        time: gl.getUniformLocation(program, 'u_time'),
-        gradientAngle: gl.getUniformLocation(program, 'u_gradientAngle'),
-        backgroundColor: gl.getUniformLocation(program, 'u_backgroundColor'),
-        meshPoints: gl.getUniformLocation(program, 'u_meshPoints'),
-        meshPointsCount: gl.getUniformLocation(program, 'u_meshPointsCount')
-      }
-    };
-
-    programRef.current = programInfo;
+    // Use the program returned from createProgram function
+    programRef.current = program;
 
     // Create quad geometry
     const positions = new Float32Array([
@@ -379,29 +363,29 @@ export default function WebGLGradientRenderer({
 
     // Animation loop
     const animate = (time: number) => {
-      if (!gl || !programInfo) return;
+      if (!gl || !program) return;
 
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
 
-      gl.useProgram(programInfo.program);
+      gl.useProgram(program.program);
 
       // Set up attributes
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-      gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
-      gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(program.attribLocations.vertexPosition);
+      gl.vertexAttribPointer(program.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
 
       gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
-      gl.enableVertexAttribArray(programInfo.attribLocations.vertexColor!);
-      gl.vertexAttribPointer(programInfo.attribLocations.vertexColor!, 2, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(program.attribLocations.vertexColor!);
+      gl.vertexAttribPointer(program.attribLocations.vertexColor!, 2, gl.FLOAT, false, 0, 0);
 
       // Set uniforms
-      gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
-      gl.uniform1f(programInfo.uniformLocations.time, time * 0.001);
-      gl.uniform1f(programInfo.uniformLocations.gradientAngle, gradientAngle);
-      
+      gl.uniform2f(program.uniformLocations.resolution, canvas.width, canvas.height);
+      gl.uniform1f(program.uniformLocations.time, time * 0.001);
+      gl.uniform1f(program.uniformLocations.gradientAngle, gradientAngle);
+
       const bgColor = colorToRgb(backgroundColor);
-      gl.uniform3f(programInfo.uniformLocations.backgroundColor, bgColor[0], bgColor[1], bgColor[2]);
+      gl.uniform3f(program.uniformLocations.backgroundColor, bgColor[0], bgColor[1], bgColor[2]);
 
       // Prepare mesh points data
       const visiblePoints = meshPoints.filter(point => !point.hideColor);
@@ -430,8 +414,8 @@ export default function WebGLGradientRenderer({
         textureData[i * 3 + 2] = rgb[2];
       }
 
-      gl.uniform4fv(programInfo.uniformLocations.meshPoints, meshPointsData);
-      gl.uniform1i(programInfo.uniformLocations.meshPointsCount, visiblePoints.length);
+      gl.uniform4fv(program.uniformLocations.meshPoints, meshPointsData);
+      gl.uniform1i(program.uniformLocations.meshPointsCount, visiblePoints.length);
 
       // Draw
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
