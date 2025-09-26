@@ -1,3 +1,5 @@
+'use client';
+
 import dynamic from 'next/dynamic';
 
 const WebGLUnifiedSceneRecorder = dynamic(() => import('@/components/WebGLUnifiedSceneRecorder'), { ssr: false });
